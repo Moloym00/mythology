@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>《真名之火》V1.2 设计评审 · 2026-09-06</title>
+<style>
+  :root{
+    --bg:#14100c; --panel:#1e1812; --panel2:#251d15; --line:#3a2e1f;
+    --ink:#e8dcc8; --ink-dim:#b3a48c; --ink-faint:#8a7c66;
+    --amber:#e8a33d; --amber-hi:#f5c16a; --ember:#c96f2e; --ash:#7a6a54;
+    --good:#8fbf6a; --bad:#d07a5a; --warn:#d9a441; --ice:#7fb5c9;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--bg); color:var(--ink); font-family:"Songti SC","Noto Serif SC","SimSun",serif; line-height:1.75; padding:0 0 60px;}
+  .wrap{max-width:980px; margin:0 auto; padding:0 22px;}
+  header{border-bottom:1px solid var(--line); padding:42px 0 26px; margin-bottom:34px; position:relative;}
+  header::after{content:""; position:absolute; left:0; right:0; bottom:-1px; height:2px;
+    background:linear-gradient(90deg,var(--ember),var(--amber),transparent 70%);}
+  .kicker{font-size:13px; letter-spacing:4px; color:var(--amber); text-transform:uppercase; margin-bottom:10px;}
+  h1{font-size:30px; font-weight:700; letter-spacing:2px; margin-bottom:8px;}
+  .sub{color:var(--ink-dim); font-size:15px;}
+  .meta{display:flex; flex-wrap:wrap; gap:8px 26px; margin-top:16px; font-size:13px; color:var(--ink-faint);}
+  h2{font-size:20px; margin:44px 0 16px; padding-left:12px; border-left:4px solid var(--ember); letter-spacing:1px;}
+  h3{font-size:16px; margin:24px 0 10px; color:var(--amber-hi);}
+  p{margin:10px 0; font-size:15px;}
+  .dim{color:var(--ink-dim);} .faint{color:var(--ink-faint);} .amber{color:var(--amber);}
+  table{width:100%; border-collapse:collapse; margin:14px 0 6px; font-size:14px;}
+  th,td{border:1px solid var(--line); padding:7px 10px; text-align:left;}
+  th{background:var(--panel2); color:var(--amber-hi); font-weight:600;}
+  td.num,th.num{text-align:right; font-variant-numeric:tabular-nums;}
+  .verdict{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:18px 0;}
+  .vcard{background:var(--panel); border:1px solid var(--line); padding:16px; text-align:center;}
+  .vcard .n{font-size:34px; font-weight:700; line-height:1.1;}
+  .vcard .l{font-size:13px; color:var(--ink-dim); margin-top:4px;}
+  .block{background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:18px 20px; margin:16px 0;}
+  .sev{display:inline-block; font-size:12px; padding:1px 8px; border-radius:3px; margin-right:8px; vertical-align:2px;}
+  .sev.sev-block{background:#5a2a1e; color:#e88d6a; border:1px solid #7a3a28;}
+  .sev.sev-serious{background:#4a3520; color:var(--warn); border:1px solid #6a4c28;}
+  .sev.sev-opt{background:#24333a; color:var(--ice); border:1px solid #33505a;}
+  .f-item{margin:22px 0; padding-left:14px; border-left:2px solid var(--line);}
+  .f-item h4{font-size:15px; margin-bottom:6px;}
+  .f-item .loc{font-size:13px; color:var(--amber); margin-bottom:6px;}
+  .f-item ul{list-style:none; margin:6px 0;}
+  .f-item li{font-size:14px; margin:4px 0; padding-left:16px; position:relative; color:var(--ink-dim);}
+  .f-item li::before{content:"·"; position:absolute; left:2px; color:var(--ember);}
+  .f-item li b{color:var(--ink); font-weight:600;}
+  .chart{margin:16px 0 8px; overflow-x:auto;}
+  .chart svg{display:block; margin:0 auto;}
+  .caption{font-size:12.5px; color:var(--ink-faint); text-align:center; margin:6px 0 4px;}
+  .note{font-size:13px; color:var(--ink-faint); background:var(--panel2); border-left:3px solid var(--ash); padding:10px 14px; margin:14px 0;}
+  .badge{font-size:12px; border:1px solid var(--line); color:var(--ink-dim); padding:1px 7px; border-radius:3px; margin-right:6px;}
+  ul.plain{margin:8px 0 8px 20px;} ul.plain li{font-size:14.5px; margin:5px 0; color:var(--ink-dim);}
+  ul.plain li b{color:var(--ink);}
+  footer{border-top:1px solid var(--line); margin-top:52px; padding-top:18px; font-size:12.5px; color:var(--ink-faint);}
+  .twocol{display:grid; grid-template-columns:1fr 1fr; gap:0 26px;}
+  @media(max-width:760px){ .verdict{grid-template-columns:repeat(2,1fr);} .twocol{grid-template-columns:1fr;} h1{font-size:24px;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">Game Design Review · Ver 1.2</div>
+  <h1>真名之火 · 最后的火塘</h1>
+  <div class="sub">《真名之火》V1.2 设计评审 —— 结构信号来自规则忠实模拟器，非真人试玩结论</div>
+  <div class="meta">
+    <span>评审日期：2026-09-06</span>
+    <span>规则依据：《玩法书_V1.2.md》（权威源）</span>
+    <span>评审对象：核心循环 / 数值结构 / 人数扩展 / 角色强度</span>
+    <span>载体：本地 HTML（离线可用）</span>
+  </div>
+</header>
+
+<h2>〇、结论摘要</h2>
+<div class="verdict">
+  <div class="vcard"><div class="n" style="color:var(--good)">0</div><div class="l">阻塞</div></div>
+  <div class="vcard"><div class="n" style="color:var(--warn)">3</div><div class="l">严重</div></div>
+  <div class="vcard"><div class="n" style="color:var(--ice)">4</div><div class="l">优化</div></div>
+  <div class="vcard"><div class="n" style="color:var(--amber)">4 人局</div><div class="l">甜蜜点成立</div></div>
+</div>
+<p><b>总述</b>：V1.2 规则结构完整、机制闭环（风暴→风化→安魂/觉醒→计分），模拟器 8 项规则回归全部通过。4 人主推配置下：安魂与觉醒次数均衡（5.14 / 5.34 尊/局）、守夜奖励高触发（91.3% 局次）、"均衡救神"策略得分显著高于"纯抢分"（11.90 vs 更低）——<b>安魂不是陷阱选项而是占优策略，4 人局是健康甜蜜点</b>。主要问题集中在<b>人数扩展表</b>（5—6 人守夜门槛倒挂、安魂流被挤出）与<b>角色强度不对称</b>（守火人全人数垫底、织名者被动领先）。</p>
+<p class="dim">证据分级说明：本报告所有"结构信号"来自按 V1.2 规则逐条实现的启发式 AI 模拟（样本见下）；角色强度与体验结论标注为"需真人验证"，不冒充已验证平衡。历史《AI模拟对局实测报告.md》已被项目批注"已失效"（未实现当前规则且计分错误），其结论未进入本报告。</p>
+
+<h2>一、验证方法</h2>
+<div class="block">
+<p><b>模拟器</b>：<code>sim_truefire.py</code>，按《玩法书_V1.2.md》逐条实现：风暴/风化/供奉觉醒（含众声）/安魂（含禁忌/祭品）/寻忆/燃忆巫术/祈神/遗赠/守艺/心智/极夜合诵（AI 按规则允许的"不出牌"处理）/终局/计分。</p>
+<p><b>规则回归</b>：8 项测试全过 —— 心智2只能烧炎；安魂骨+禁忌支付；2枚得神/1枚余音；众声觉醒各1余音；计分例复算=20 分（与规则书 241 行示例一致）；移渡补满觉醒；乌伦任意当星+恢复心智；奥贡免禁忌费。</p>
+<table>
+  <tr><th>样本</th><th>人数</th><th>局数</th><th>随机种子</th><th>用途</th></tr>
+  <tr><td>主推配置</td><td>4 人</td><td>5,000</td><td>7</td><td>核心结构信号</td></tr>
+  <tr><td>人数扩展</td><td>3 / 5 / 6 人</td><td>各 2,000</td><td>11</td><td>人数对比</td></tr>
+  <tr><td>守夜/安魂分布</td><td>3—6 人</td><td>2,000—5,000</td><td>21</td><td>守夜触发率</td></tr>
+  <tr><td>对照策略（纯抢分）</td><td>4 / 6 人</td><td>5,000 / 2,000</td><td>7 / 21</td><td>风暴威胁真实性</td></tr>
+</table>
+<p class="faint">AI 为启发式（供奉/安魂/燃忆/祈神带简单评分），用于结构统计，不代表真人博弈强弱。极夜合诵 AI 不出牌；听冬者预判未发动；问途者按"整回合任意牌当任意语素"简化。涉及这三个能力/角色的强度结论尤其保守。</p>
+</div>
+
+<h2>二、核心证据</h2>
+
+<h3>图 A · 人数扩展对比（每局均值）</h3>
+<div class="chart">
+<svg viewBox="0 0 940 330" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="inherit">
+  <style>
+    .ax{stroke:#3a2e1f; stroke-width:1;} .tx{fill:#b3a48c; font-size:12px;} .th{fill:#e8dcc8; font-size:12px; font-weight:bold;}
+    .tb{fill:#8a7c66; font-size:11px;}
+  </style>
+  <!-- 分组柱状：每人数 4 指标：觉醒/安魂/守夜触发%/均分 -->
+  <g>
+    <text x="470" y="22" text-anchor="middle" class="th" font-size="14">每局觉醒·安魂（尊）与守夜触发率（%）·平均分，按人数</text>
+    <line x1="60" y1="40" x2="60" y2="290" class="ax"/>
+    <line x1="60" y1="290" x2="920" y2="290" class="ax"/>
+    <!-- 网格 -->
+    <g class="tb">
+      <line x1="60" y1="290" x2="920" y2="290" stroke="#3a2e1f" stroke-width="0.5"/>
+      <text x="52" y="293" text-anchor="end">0</text>
+      <line x1="60" y1="230" x2="920" y2="230" stroke="#2e2518" stroke-width="0.5"/>
+      <text x="52" y="233" text-anchor="end">2</text>
+      <line x1="60" y1="170" x2="920" y2="170" stroke="#2e2518" stroke-width="0.5"/>
+      <text x="52" y="173" text-anchor="end">4</text>
+      <line x1="60" y1="110" x2="920" y2="110" stroke="#2e2518" stroke-width="0.5"/>
+      <text x="52" y="113" text-anchor="end">6</text>
+      <line x1="60" y1="50" x2="920" y2="50" stroke="#2e2518" stroke-width="0.5"/>
+      <text x="52" y="53" text-anchor="end">8</text>
+    </g>
+    <!-- 组：3人 x=140 4人 x=350 5人 x=560 6人 x=770 -->
+    <!-- 3人 -->
+    <rect x="95"  y="197" width="34" height="93"  fill="#c96f2e"/><text x="112" y="191" text-anchor="middle" class="tb" fill="#c96f2e">2.81</text>
+    <rect x="137" y="120" width="34" height="170" fill="#7fb5c9"/><text x="154" y="114" text-anchor="middle" class="tb" fill="#7fb5c9">4.22</text>
+    <rect x="179" y="248" width="34" height="42"  fill="#d9a441"/><text x="196" y="284" text-anchor="middle" class="tb" fill="#d9a441">88.3%</text>
+    <rect x="221" y="184" width="34" height="106" fill="#8fbf6a"/><text x="238" y="178" text-anchor="middle" class="tb" fill="#8fbf6a">9.82</text>
+    <text x="158" y="310" text-anchor="middle" class="th">3 人</text>
+    <!-- 4人 -->
+    <rect x="305" y="90"  width="34" height="200" fill="#c96f2e"/><text x="322" y="84" text-anchor="middle" class="tb" fill="#c96f2e">5.34</text>
+    <rect x="347" y="96"  width="34" height="194" fill="#7fb5c9"/><text x="364" y="90" text-anchor="middle" class="tb" fill="#7fb5c9">5.14</text>
+    <rect x="389" y="244" width="34" height="46"  fill="#d9a441"/><text x="406" y="284" text-anchor="middle" class="tb" fill="#d9a441">91.3%</text>
+    <rect x="431" y="142" width="34" height="148" fill="#8fbf6a"/><text x="448" y="136" text-anchor="middle" class="tb" fill="#8fbf6a">11.90</text>
+    <text x="368" y="310" text-anchor="middle" class="th" fill="#e8a33d">4 人 ★</text>
+    <!-- 5人 -->
+    <rect x="515" y="66"  width="34" height="224" fill="#c96f2e"/><text x="532" y="60" text-anchor="middle" class="tb" fill="#c96f2e">6.37</text>
+    <rect x="557" y="118" width="34" height="172" fill="#7fb5c9"/><text x="574" y="112" text-anchor="middle" class="tb" fill="#7fb5c9">4.57</text>
+    <rect x="599" y="266" width="34" height="24"  fill="#d9a441"/><text x="616" y="284" text-anchor="middle" class="tb" fill="#d9a441">28.4%</text>
+    <rect x="641" y="184" width="34" height="106" fill="#8fbf6a"/><text x="658" y="178" text-anchor="middle" class="tb" fill="#8fbf6a">10.21</text>
+    <text x="578" y="310" text-anchor="middle" class="th">5 人</text>
+    <!-- 6人 -->
+    <rect x="725" y="46"  width="34" height="244" fill="#c96f2e"/><text x="742" y="40" text-anchor="middle" class="tb" fill="#c96f2e">7.17</text>
+    <rect x="767" y="148" width="34" height="142" fill="#7fb5c9"/><text x="784" y="142" text-anchor="middle" class="tb" fill="#7fb5c9">3.84</text>
+    <rect x="809" y="281" width="34" height="9"   fill="#d9a441"/><text x="826" y="284" text-anchor="middle" class="tb" fill="#d9a441">12.2%</text>
+    <rect x="851" y="202" width="34" height="88"  fill="#8fbf6a"/><text x="868" y="196" text-anchor="middle" class="tb" fill="#8fbf6a">9.09</text>
+    <text x="788" y="310" text-anchor="middle" class="th">6 人</text>
+    <!-- 图例 -->
+    <g class="tx">
+      <rect x="240" y="326" width="12" height="12" fill="#c96f2e"/><text x="258" y="336">觉醒/局</text>
+      <rect x="330" y="326" width="12" height="12" fill="#7fb5c9"/><text x="348" y="336">安魂/局</text>
+      <rect x="420" y="326" width="12" height="12" fill="#d9a441"/><text x="438" y="336">守夜触发局%</text>
+      <rect x="530" y="326" width="12" height="12" fill="#8fbf6a"/><text x="548" y="336">平均分</text>
+    </g>
+  </g>
+</svg>
+</div>
+<p class="caption">数据：3/5/6 人局各 2,000 局（seed 11），4 人局 5,000 局（seed 7）；守夜触发局占比来自独立样本（seed 21）。</p>
+<p class="dim">读数：<b>4 人局觉醒/安魂最均衡（5.34/5.14）、平均分最高（11.90）、守夜触发率最高（91.3%）</b>。人数越多，觉醒越挤、安魂越少、守夜触发率断崖（5 人 28.4%、6 人 12.2%）。6 人局 52.2% 的玩家整局一尊未安魂（见 图 D 附表）。</p>
+
+<h3>图 B · 策略对照：风暴威胁的真实性（4 人局）</h3>
+<div class="chart">
+<svg viewBox="0 0 940 240" width="100%" xmlns="http://www.w3.org/2000/svg">
+  <text x="470" y="24" text-anchor="middle" class="th" font-size="14" fill="#e8dcc8" style="font-size:14px;fill:#e8dcc8;font-weight:bold">均衡救神 vs 纯抢分（不救神）· 4 人局各 5,000 局</text>
+  <line x1="60" y1="40" x2="60" y2="200" stroke="#3a2e1f"/>
+  <line x1="60" y1="200" x2="920" y2="200" stroke="#3a2e1f"/>
+  <g style="font-size:11px;fill:#8a7c66">
+    <line x1="60" y1="200" x2="920" y2="200" stroke="#2e2518" stroke-width="0.5"/><text x="52" y="203" text-anchor="end">0</text>
+    <line x1="60" y1="155" x2="920" y2="155" stroke="#2e2518" stroke-width="0.5"/><text x="52" y="158" text-anchor="end">2</text>
+    <line x1="60" y1="110" x2="920" y2="110" stroke="#2e2518" stroke-width="0.5"/><text x="52" y="113" text-anchor="end">4</text>
+    <line x1="60" y1="65" x2="920" y2="65" stroke="#2e2518" stroke-width="0.5"/><text x="52" y="68" text-anchor="end">6</text>
+  </g>
+  <!-- 均衡组 -->
+  <text x="240" y="34" text-anchor="middle" style="font-size:13px;fill:#e8dcc8;font-weight:bold">均衡（当前 AI）</text>
+  <rect x="130" y="173" width="60" height="27" fill="#c96f2e"/><text x="160" y="167" text-anchor="middle" style="font-size:11px;fill:#c96f2e">觉醒 5.34</text>
+  <rect x="220" y="173" width="60" height="27" fill="#7fb5c9"/><text x="250" y="167" text-anchor="middle" style="font-size:11px;fill:#7fb5c9">安魂 5.14</text>
+  <rect x="310" y="196" width="60" height="4"  fill="#d9a441"/><text x="340" y="168" text-anchor="middle" style="font-size:11px;fill:#d9a441">共同失败 0.0%</text>
+  <!-- 纯抢分组 -->
+  <text x="700" y="34" text-anchor="middle" style="font-size:13px;fill:#d07a5a;font-weight:bold">纯抢分（不救神）</text>
+  <rect x="590" y="155" width="60" height="45" fill="#c96f2e"/><text x="620" y="149" text-anchor="middle" style="font-size:11px;fill:#c96f2e">觉醒 6.87</text>
+  <rect x="680" y="200" width="60" height="0" fill="#7fb5c9"/>
+  <rect x="770" y="179" width="60" height="21" fill="#d07a5a"/><text x="800" y="173" text-anchor="middle" style="font-size:11px;fill:#d07a5a">共同失败 3.9%</text>
+  <text x="620" y="222" text-anchor="middle" style="font-size:11px;fill:#7fb5c9">安魂 0.00</text>
+  <g style="font-size:11px;fill:#8a7c66">
+    <rect x="400" y="34" width="12" height="12" fill="#c96f2e"/><text x="418" y="44">每局觉醒尊数</text>
+    <rect x="520" y="34" width="12" height="12" fill="#7fb5c9"/><text x="538" y="44">每局安魂尊数</text>
+    <rect x="640" y="34" width="12" height="12" fill="#d07a5a"/><text x="658" y="44">四座全毁（共同失败）占比</text>
+  </g>
+</svg>
+</div>
+<p class="caption">数据：4 人局均衡 5,000 局（seed 7）与纯抢分 5,000 局（seed 7）。湮灭尊数：均衡 0.04/局 vs 纯抢分 1.68/局。</p>
+<p class="dim">读数：<b>风暴是真实威胁但不到压人程度</b>——完全无视风化，四座全毁率也仅 3.9%（5000 局中 195 局），每局平均湮灭 1.68 尊。而均衡策略把共同失败压到 0、湮灭压到 0.04，代价是每局少觉醒 1.53 尊（≈ 每人少 1.9 分），换回安魂 5.14 尊 + 遗赠 + 守夜。得分对比（均衡均分 11.90）表明：<b>救神是占优策略，安魂机制设计健康</b>——它同时承担"止损"与"得分"，不是陷阱选项。</p>
+
+<h3>图 C · 角色强度（4 人局，按 AI 实现）</h3>
+<div class="chart">
+<svg viewBox="0 0 940 250" width="100%" xmlns="http://www.w3.org/2000/svg">
+  <text x="470" y="24" text-anchor="middle" style="font-size:14px;fill:#e8dcc8;font-weight:bold">六萨满平均分（4 人局 5,000 局，n≈3,300+/人）</text>
+  <line x1="150" y1="44" x2="150" y2="210" stroke="#3a2e1f"/>
+  <line x1="150" y1="210" x2="900" y2="210" stroke="#3a2e1f"/>
+  <g style="font-size:11px;fill:#8a7c66">
+    <line x1="150" y1="210" x2="900" y2="210" stroke="#2e2518" stroke-width="0.5"/><text x="142" y="213" text-anchor="end">0</text>
+    <line x1="150" y1="170" x2="900" y2="170" stroke="#2e2518" stroke-width="0.5"/><text x="142" y="173" text-anchor="end">2.5</text>
+    <line x1="150" y1="130" x2="900" y2="130" stroke="#2e2518" stroke-width="0.5"/><text x="142" y="133" text-anchor="end">5</text>
+    <line x1="150" y1="90" x2="900" y2="90" stroke="#2e2518" stroke-width="0.5"/><text x="142" y="93" text-anchor="end">7.5</text>
+    <line x1="150" y1="50" x2="900" y2="50" stroke="#2e2518" stroke-width="0.5"/><text x="142" y="53" text-anchor="end">10</text>
+  </g>
+  <!-- 条形（横向） -->
+  <g>
+    <text x="140" y="92" text-anchor="end" style="font-size:12px;fill:#e8dcc8">织名者</text>
+    <rect x="150" y="80" width="151" height="14" fill="#e8a33d"/>
+    <text x="308" y="92" style="font-size:11px;fill:#e8a33d">12.63</text>
+    <text x="140" y="118" text-anchor="end" style="font-size:12px;fill:#e8dcc8">渡魂人</text>
+    <rect x="150" y="106" width="147" height="14" fill="#e8a33d"/>
+    <text x="304" y="118" style="font-size:11px;fill:#e8a33d">12.35</text>
+    <text x="140" y="144" text-anchor="end" style="font-size:12px;fill:#e8dcc8">刻骨者</text>
+    <rect x="150" y="132" width="143" height="14" fill="#d9a441"/>
+    <text x="300" y="144" style="font-size:11px;fill:#d9a441">12.06</text>
+    <text x="140" y="170" text-anchor="end" style="font-size:12px;fill:#e8dcc8">问途者</text>
+    <rect x="150" y="158" width="141" height="14" fill="#d9a441"/>
+    <text x="298" y="170" style="font-size:11px;fill:#d9a441">11.92</text>
+    <text x="140" y="196" text-anchor="end" style="font-size:12px;fill:#e8dcc8">听冬者</text>
+    <rect x="150" y="184" width="141" height="14" fill="#d9a441"/>
+    <text x="298" y="196" style="font-size:11px;fill:#d9a441">11.92</text>
+    <text x="140" y="222" text-anchor="end" style="font-size:12px;fill:#e8dcc8">守火人</text>
+    <rect x="150" y="210" width="122" height="14" fill="#d07a5a"/>
+    <text x="279" y="222" style="font-size:11px;fill:#d07a5a">10.50</text>
+  </g>
+</svg>
+</div>
+<p class="caption">同一数字在不同人数下趋势一致：3 人局垫底 8.40（次低 10.01）、5 人局 9.50（次低 10.04）、6 人局 8.46（次低 8.68）；织名者在 3/4/5/6 人局均为第一或并列第一。</p>
+<p class="dim">读数：<b>守火人全人数垫底、织名者全人数领先，差 2.1 分（4 人局）</b>。机制层面可解释：织名者被动"参与觉醒即 +1 余音"零成本、高频触发（非赢家觉醒每局 1.3 次/人）；守火人救神要烧牌 + 付心智，收益是公共的（保住神座人人受益）。<span class="amber">此为 AI 结构信号，守火人/听冬者的实现额外保守，必须真人试玩后才能定性。</span></p>
+
+<h3>图 D · 轮数分布与安魂分布（4 人局）</h3>
+<div class="twocol">
+<div class="chart">
+<svg viewBox="0 0 450 230" width="100%" xmlns="http://www.w3.org/2000/svg">
+  <text x="225" y="22" text-anchor="middle" style="font-size:13px;fill:#e8dcc8;font-weight:bold">结束轮数分布（5,000 局）</text>
+  <line x1="50" y1="36" x2="50" y2="190" stroke="#3a2e1f"/>
+  <line x1="50" y1="190" x2="430" y2="190" stroke="#3a2e1f"/>
+  <g style="font-size:11px;fill:#8a7c66">
+    <line x1="50" y1="190" x2="430" y2="190" stroke="#2e2518" stroke-width="0.5"/><text x="42" y="193" text-anchor="end">0</text>
+    <line x1="50" y1="145" x2="430" y2="145" stroke="#2e2518" stroke-width="0.5"/><text x="42" y="148" text-anchor="end">1000</text>
+    <line x1="50" y1="100" x2="430" y2="100" stroke="#2e2518" stroke-width="0.5"/><text x="42" y="103" text-anchor="end">2000</text>
+    <line x1="50" y1="55" x2="430" y2="55" stroke="#2e2518" stroke-width="0.5"/><text x="42" y="58" text-anchor="end">3000</text>
+  </g>
+  <g>
+    <rect x="95"  y="189.6" width="40" height="0.4" fill="#7a6a54"/>
+    <text x="115" y="206" text-anchor="middle" style="font-size:11px;fill:#b3a48c">8轮 2</text>
+    <rect x="170" y="183" width="40" height="7" fill="#d9a441"/>
+    <text x="190" y="206" text-anchor="middle" style="font-size:11px;fill:#b3a48c">9轮 129</text>
+    <rect x="245" y="133" width="40" height="57" fill="#d9a441"/>
+    <text x="265" y="206" text-anchor="middle" style="font-size:11px;fill:#b3a48c">10轮 1020</text>
+    <rect x="320" y="0" width="40" height="190" fill="#c96f2e"/>
+    <text x="340" y="206" text-anchor="middle" style="font-size:11px;fill:#c96f2e">11轮 3849</text>
+  </g>
+</svg>
+</div>
+<div class="chart">
+<svg viewBox="0 0 450 230" width="100%" xmlns="http://www.w3.org/2000/svg">
+  <text x="225" y="22" text-anchor="middle" style="font-size:13px;fill:#e8dcc8;font-weight:bold">单玩家安魂尊数分布（5,000 局 × 4 人）</text>
+  <line x1="50" y1="36" x2="50" y2="190" stroke="#3a2e1f"/>
+  <line x1="50" y1="190" x2="430" y2="190" stroke="#3a2e1f"/>
+  <g style="font-size:11px;fill:#8a7c66">
+    <line x1="50" y1="190" x2="430" y2="190" stroke="#2e2518" stroke-width="0.5"/><text x="42" y="193" text-anchor="end">0%</text>
+    <line x1="50" y1="145" x2="430" y2="145" stroke="#2e2518" stroke-width="0.5"/><text x="42" y="148" text-anchor="end">10%</text>
+    <line x1="50" y1="100" x2="430" y2="100" stroke="#2e2518" stroke-width="0.5"/><text x="42" y="103" text-anchor="end">20%</text>
+    <line x1="50" y1="55" x2="430" y2="55" stroke="#2e2518" stroke-width="0.5"/><text x="42" y="58" text-anchor="end">30%</text>
+  </g>
+  <g>
+    <rect x="95"  y="134" width="40" height="56" fill="#7fb5c9"/><text x="115" y="206" text-anchor="middle" style="font-size:11px;fill:#b3a48c">0尊 26.3%</text>
+    <rect x="170" y="112" width="40" height="78" fill="#7fb5c9"/><text x="190" y="206" text-anchor="middle" style="font-size:11px;fill:#b3a48c">1尊 35.2%</text>
+    <rect x="245" y="134" width="40" height="56" fill="#e8a33d"/><text x="265" y="206" text-anchor="middle" style="font-size:11px;fill:#b3a48c">2尊 25.0%</text>
+    <rect x="320" y="168" width="40" height="22" fill="#e8a33d"/><text x="340" y="206" text-anchor="middle" style="font-size:11px;fill:#b3a48c">3尊+ 13.4%</text>
+  </g>
+</svg>
+</div>
+</div>
+<p class="caption">左：77.0% 的局打到 11 轮上限（风暴翻完）结束，23.0% 因"后备空且在场≤1"提前结束。右：26.3% 的玩家整局一尊未安魂，38.4% 达到守夜门槛（≥2 尊）。</p>
+
+<h2>三、发现清单</h2>
+
+<div class="sev sev-serious">严重</div><h3 style="display:inline">S1 · 5—6 人局守夜奖励门槛与局势倒挂</h3>
+<div class="f-item">
+  <div class="loc">位置：《玩法书_V1.2.md》第 46 行人数配置表——"5—6｜安魂至少三尊"；守夜奖励规则。</div>
+  <ul>
+    <li><b>问题</b>：5—6 人局神数不变（12 尊）但人均更少（6 人约 1.8 尊/人），安魂空间被觉醒竞争挤压，门槛反而提高到 3 尊。</li>
+    <li><b>证据</b>：守夜触发局占比 5 人 28.4%、6 人 12.2%（4 人 91.3%）；6 人局 52.2% 的玩家整局 0 安魂，安魂 ≥3 尊的玩家仅 2.1%。</li>
+    <li><b>影响</b>：5—6 人局守夜奖励实际从规则中消失（6 人局 12% 触发≈极小概率事件），计分表承诺的奖励不可达，安魂在 6 人局失去主要动机。</li>
+    <li><b>最小修改</b>：将 5—6 人局守夜条件改为"安魂至少两尊"（与 3—4 人一致）；或改为相对条件"本局安魂最多的玩家 +2"。前者一行改动、与其余人数一致，优先推荐。</li>
+    <li><b>回归面</b>：计分表（42—46 行）、守夜奖励正文、安魂/觉醒策略权衡、6 人局得分分布复测（预期触发率回到 40%+ 量级）。</li>
+  </ul>
+</div>
+
+<div class="sev sev-serious">严重</div><h3 style="display:inline">S2 · 6 人局安魂流被觉醒挤出，游戏退化为纯抢分</h3>
+<div class="f-item">
+  <div class="loc">位置：人数配置表 5—6 人局；安魂/遗赠/希内神恩等安魂系机制。</div>
+  <ul>
+    <li><b>问题</b>：6 人局觉醒 7.17 尊/局 vs 安魂 3.84 尊/局（4 人局 5.34/5.14），遗赠使用 2.7 次/局（4 人 4.2）；安魂系机制（遗赠、守夜、希内努伊特波神恩、安魂得牌）大面积闲置。</li>
+    <li><b>证据</b>：6 人局 66.2% 以"后备空+在场≤1"提前结束（神被抢光），均分 9.09 为四档最低，最高分平均 13.14。</li>
+    <li><b>影响</b>：6 人局策略空间收窄为"抢觉醒"单线，安魂作为失败止损与遗赠引擎的角色消失；得分被压缩（人均处理神数少），体验与 4 人局差异过大。</li>
+    <li><b>最小修改</b>：与 S1 合并处理（先降守夜门槛观察）；若仍不够，给 6 人局安魂追加"安魂时多摸一张"或遗赠二次使用不降分，或接受"6 人局=快节奏觉醒局"并在规则中写明定位差异。</li>
+    <li><b>回归面</b>：安魂频率、遗赠使用率、6 人局结束原因分布、角色强度排序。</li>
+  </ul>
+</div>
+
+<div class="sev sev-serious">严重</div><h3 style="display:inline">S3 · 角色强度不对称：守火人全人数垫底、织名者全人数领先</h3>
+<div class="f-item">
+  <div class="loc">位置：六萨满定义；守火人（守艺·烧牌救神）与织名者（被动余音）能力条目。</div>
+  <ul>
+    <li><b>问题</b>：AI 证据下守火人平均分在 3/4/5/6 人局均为末位（4 人 10.50 vs 织名者 12.63，差 2.13 分），织名者均居首（并列）——差幅超过"位置感差异"，接近 1 尊唤醒神的分值。</li>
+    <li><b>机制解释</b>：织名者被动零成本、触发高频（每次参与非赢家觉醒 +1 余音，4 人局觉醒 5.34 尊/局，非赢家参与约 1.3 次/人）；守火人救神须烧牌+付心智（非炎 -1），且收益是公共的（保住的觉醒机会属于场上任何人）。</li>
+    <li><b>影响</b>：选角出现明显强弱排序，守火人成为"吃力不讨好"角色；心智资源被守火人频繁消耗，其容错空间低于其他角色。</li>
+    <li><b>最小修改</b>：给守火人个人收益锚点——如"烧骨救神时自己 +1 余音"或"烧牌救神后摸一张"；同时把织名者被动限为"每尊神每名织名者至多触发一次"（防多神堆叠，当前 AI 下叠加上限低，主要防真人刷分）。</li>
+    <li><b>回归面</b>：六角色强度排序复测、心智规则联动、烧骨巫术收益、真人试玩重点观察项。<span class="amber">注意：听冬者（预判类能力）在 AI 中未发动、守火人实现偏保守，此条是"需真人验证"的强信号而非定论。</span></li>
+  </ul>
+</div>
+
+<div class="sev sev-opt">优化</div><h3 style="display:inline">O1 · "四座全毁"共同失败几乎不触发，风暴是保险丝而非张力</h3>
+<div class="f-item">
+  <div class="loc">位置：终局条件"四座神座全部成为废墟"；风暴牌配置（3/4/4）。</div>
+  <ul>
+    <li><b>证据</b>：均衡策略 5,000 局共同失败 0 次；纯抢分 5,000 局仅 3.9%。湮灭 0.04 尊/局（均衡）。</li>
+    <li><b>判断</b>：共同失败作为"极端保险丝"成立（防止纯摆烂局无限拖），但玩家几乎感受不到"火塘陷落"的威胁张力。是否提升取决于设计意图。</li>
+    <li><b>可选修改</b>：若要让风暴更"咬人"，可给极夜风暴追加"目标风化+2"或增加 1—2 张双目标初冬；若维持现状，建议在规则中写明"共同失败为极小概率保险丝"，避免新手误以为常会发生。</li>
+    <li><b>回归面</b>：湮灭率、安魂必要性、3 人局（湮灭最高档）平衡。</li>
+  </ul>
+</div>
+
+<div class="sev sev-opt">优化</div><h3 style="display:inline">O2 · 游戏时长几乎恒定等于上限，玩家处理速度普遍"输给"风暴</h3>
+<div class="f-item">
+  <div class="loc">位置：每轮固定翻 1 张风暴；结束条件双通道（风暴翻完 / 后备空+在场≤1）。</div>
+  <ul>
+    <li><b>证据</b>：4 人局 77.0% 打满 11 轮上限，3 人局 91.8% 打满 9 轮；终局仍有在场未处理神：3 人 1.93 尊、4 人 1.47 尊。</li>
+    <li><b>影响</b>：风暴堆是唯一主时钟，玩家节奏贡献弱；"提前处理完 12 神"的掌控感只在 23%（4 人）局中出现。真人规划力强于 AI，提前结束率会上升，但结构上风暴主导。</li>
+    <li><b>可选修改</b>：若想更多局"玩家主导节奏"，可减 1 张风暴（4 人 3/3/3，10 轮上限）或提高补神速度；若接受"风暴即倒计时"的压迫感，维持现状并让每轮风暴更早加压（见 O1）。</li>
+    <li><b>回归面</b>：轮数分布、终局在场神数、单局时长（目标 90 分钟内）。</li>
+  </ul>
+</div>
+
+<div class="sev sev-opt">优化</div><h3 style="display:inline">O3 · 众声觉醒极罕见，且无人有动机促成它</h3>
+<div class="f-item">
+  <div class="loc">位置：觉醒·众声结算（三人各 1 枚同时补满）。</div>
+  <ul>
+    <li><b>证据</b>：4 人局 0.16 次/局（约每 6 局一次），3 人局 0.02 次/局；纯抢分 0.24 次/局。</li>
+    <li><b>机制解释</b>：凑齐众声的玩家与被动受益者都只 +1 余音，发起者没有额外收益——想得神的人要 2 枚，没人愿意"做第三枚"。</li>
+    <li><b>可选修改</b>：若众声是设计亮点，给发起者额外激励（如发起者 +2 余音或摸牌，其他人 +1）；若作为稀有惊喜事件，建议在规则中写明"约每 5—10 局出现一次"的预期，管理玩家期待。</li>
+    <li><b>回归面</b>：众声触发率、觉醒归属的博弈（是否出现故意卡 1 枚）。</li>
+  </ul>
+</div>
+
+<div class="sev sev-opt">优化</div><h3 style="display:inline">O4 · 3 人局神偏多：约 2 尊神被"白扔"</h3>
+<div class="f-item">
+  <div class="loc">位置：人数配置表"3 人｜随机九尊｜三/三/三张｜九轮"。</div>
+  <ul>
+    <li><b>证据</b>：3 人局 9 尊神中约 7.0 尊被处理（觉醒 2.81 + 安魂 4.22），终局在场未处理 1.93 尊，91.8% 打满 9 轮。</li>
+    <li><b>影响</b>：9 轮 × 3 人 = 27 行动，处理 7 尊神（觉醒需 3 张/尊）压力偏紧；终局 2 尊神既未觉醒也未安魂，留给"风暴吞神"的浪费偏多。</li>
+    <li><b>可选修改</b>：3 人局改 8 尊（随机八尊）或风暴减为 2/2/2（6 轮）；前者一行改动，优先推荐。</li>
+    <li><b>回归面</b>：3 人局轮数、终局剩余神数、均分与满分率。</li>
+  </ul>
+</div>
+
+<h2>四、计分与结构校验</h2>
+<div class="block">
+<table>
+  <tr><th>校验项</th><th class="num">预期</th><th class="num">模拟/复算</th><th>结果</th></tr>
+  <tr><td>规则书计分例（241 行：觉醒2×5 + 安魂2(1遗赠已用:2+3) + 余音3 + 守夜2）</td><td class="num">20</td><td class="num">20</td><td style="color:var(--good)">通过</td></tr>
+  <tr><td>4 人局守夜奖励触发局占比（条件：安魂≥2）</td><td class="num">—</td><td class="num">91.3%</td><td>健康</td></tr>
+  <tr><td>5 人局守夜奖励触发局占比（条件：安魂≥3）</td><td class="num">—</td><td class="num">28.4%</td><td style="color:var(--warn)">倒挂（S1）</td></tr>
+  <tr><td>6 人局守夜奖励触发局占比（条件：安魂≥3）</td><td class="num">—</td><td class="num">12.2%</td><td style="color:var(--warn)">接近消失（S1）</td></tr>
+  <tr><td>共同失败率（均衡 4 人 5,000 局）</td><td class="num">—</td><td class="num">0.0%</td><td>保险丝（O1）</td></tr>
+  <tr><td>共同失败率（纯抢分 4 人 5,000 局）</td><td class="num">—</td><td class="num">3.9%</td><td>风暴为真实威胁</td></tr>
+  <tr><td>每局处理神数（觉醒+安魂+众声+湮灭，4 人）</td><td class="num">≈12</td><td class="num">10.68</td><td>终局约 1.3—1.5 尊在场（O2）</td></tr>
+</table>
+</div>
+
+<h2>五、与《劫走黎明》的对照（项目间参考）</h2>
+<div class="block">
+<p>两项目都在"开发中"阶段暴露了同一类结构问题：<b>平衡量在甜蜜点成立，扩展档位失衡</b>。</p>
+<ul class="plain">
+  <li>《劫走黎明》：三方僵持率随人数陡增（8 人局约 19%），夺宝人均收益 0.16—0.31 次——委托难度差 3—4 倍；核心修复方向是委托难度归一与僵持缓解。</li>
+  <li>《真名之火》：4 人局均衡健康，但 5—6 人局守夜门槛倒挂（S1）、安魂流被挤出（S2）——人数扩展表（42—46 行）是两项目共同的"高危区"，建议在规则书的扩展表上直接标注每档的预期体验差异，并把扩展档的数值验证纳入每次改版的标准回归。</li>
+</ul>
+</div>
+
+<h2>六、下一步建议</h2>
+<div class="block">
+<ul class="plain">
+  <li><b>先改三处</b>：S1（守夜门槛 5—6 人改 ≥2）、S2 观察项（6 人局安魂补偿）、S3（守火人收益锚点 + 织名者被动上限），一次只改一个变量，改完重跑本模拟器的对应人数档回归。</li>
+  <li><b>真人试玩协议（首要）</b>：4 人局 × 至少 3 桌，记录——每局轮数、是否打满上限、每人觉醒/安魂尊数、守火人与织名者选角率与胜率、极夜合诵实际行为（AI 完全未覆盖）。对照 AI 数字（均分 11.90、守夜 91.3%、轮数 10.74）找偏差方向。</li>
+  <li><b>二次模拟任务</b>：极夜合诵真人行为建模（AI 目前不出牌，合诵的巫术/供神收益未量化）；听冬者/问途者精确实现后再复测角色强度。</li>
+  <li><b>本文档更新</b>：改动落地后，本报告的"证据图表"用同一模拟器重跑并替换，保持口径一致（劫走黎明先例：评审记录随版本迭代更新）。</li>
+</ul>
+</div>
+
+<h2>七、来源与局限</h2>
+<div class="block">
+<p class="faint">规则权威源：《玩法书_V1.2.md》（D:\06_Projects\桌游设计\开发中\神话\），全部规则以该文件为准。模拟器 sim_truefire.py 位于 agent 工作区，8 项回归测试内置于脚本。美术侧《00_美术开发总览.html》显示 12 神/6 萨满/12 风暴美术锚点齐备，本评审未涉及美术与生产。</p>
+<p class="faint">局限披露：① AI 为启发式，所有强度结论是"结构信号"，仅标注为需真人验证；② 极夜合诵 AI 一律不出牌，听冬者未发动，问途者简化实现——涉及三者的结论偏保守；③ 历史 AI 报告（《AI模拟对局实测报告.md》）已被项目批注失效，其"阿伊努必胜/游戏过短"等旧结论与当前规则无关，未引用；④ 模拟未覆盖 5—6 人局极夜合诵的集体收益、也未模拟真人"故意促成众声/安魂流"的博弈。</p>
+</div>
+
+<footer>
+  《真名之火 · 最后的火塘》V1.2 设计评审 · 生成于 2026-09-06 · 规则忠实模拟 + 分级发现（阻塞/严重/优化）· 数据可复算：python sim_truefire.py
+</footer>
+
+</div>
+</body>
+</html>
