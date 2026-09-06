@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>《真名之火》美术风格样张 V1</title>
+  <style>
+    :root{--paper:#f8f5eb;--paper2:#eee7d7;--ink:#263830;--muted:#766f62;--line:#cfc4ae;--bone:#a56a3a;--wind:#58756d;--tide:#386d78;--fire:#b8543d;--star:#b28a45;--cold:#5d7480}
+    *{box-sizing:border-box}html{background:#e7e2d7;color:var(--ink)}body{margin:0;font:15px/1.65 "Microsoft YaHei","PingFang SC",sans-serif;background:linear-gradient(120deg,#e8e4da,#dcd8cf)}
+    header{padding:48px max(24px,calc((100vw - 1180px)/2));background:var(--paper);border-bottom:1px solid #d2c8b5}header small{letter-spacing:4px;color:#9a704e}h1{margin:8px 0 10px;font:700 42px/1.2 "Songti SC",SimSun,serif;letter-spacing:7px}header p{max-width:760px;margin:0;color:#635f56}
+    main{max-width:1180px;margin:auto;padding:28px 24px 80px}section{margin:20px 0;padding:24px 26px;background:rgba(248,245,235,.94);border:1px solid #d4cab7;border-radius:8px}h2{margin:0 0 16px;font:700 25px/1.3 "Songti SC",SimSun,serif;color:#734c36}.note{padding:10px 14px;border-left:3px solid var(--fire);background:#f2e9dc;color:#5c564d}
+    .symbol-board{width:100%;display:block;background:var(--paper);border:1px solid #ddd3c0}.scale-row{display:flex;align-items:flex-end;flex-wrap:wrap;gap:20px;margin-top:18px}.scale-set{display:flex;gap:10px;align-items:flex-end}.scale-set b{align-self:center;margin-right:4px}.chip{display:grid;place-items:center;background:#fbf8ef;border:1px solid #d8ceba;border-radius:50%;color:var(--ink)}.chip svg{width:72%;height:72%}.chip.s{width:10mm;height:10mm}.chip.m{width:18mm;height:18mm}.bone{color:var(--bone)}.wind{color:var(--wind)}.tide{color:var(--tide)}.fire{color:var(--fire)}.star{color:var(--star)}
+    .cards{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start}.card{position:relative;overflow:hidden;background:var(--paper);box-shadow:0 4px 16px rgba(53,43,30,.16);isolation:isolate}.card:after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 8mm rgba(248,245,235,.9)}
+    .deity{width:90mm;height:85mm}.deity .art{position:absolute;inset:0 0 29mm 0;width:100%;height:56mm;object-fit:cover;object-position:center 62%;filter:saturate(.82) contrast(.96)}.deity .veil{position:absolute;inset:35mm 0 0;background:linear-gradient(180deg,rgba(248,245,235,0),var(--paper) 15mm)}.deity .top{position:absolute;z-index:2;top:5mm;left:6mm;right:6mm;display:flex;justify-content:space-between;color:#504b42;font-size:8pt;letter-spacing:.7px}.deity .body{position:absolute;z-index:2;left:6mm;right:6mm;bottom:5mm}.deity h3{margin:0;font:700 18pt/1.1 "Songti SC",SimSun,serif;letter-spacing:1px}.latin{margin-top:1mm;color:#6d685e;font:italic 9pt Georgia,serif}.name-row{display:flex;justify-content:space-between;align-items:flex-end;gap:4mm}.runes{display:flex;gap:1.4mm}.rune{width:9mm;height:9mm;display:grid;place-items:center;border-radius:50%;background:rgba(255,253,247,.86);border:1px solid currentColor}.rune svg{width:6.5mm;height:6.5mm}.effect{margin-top:2.5mm;padding-top:2mm;border-top:1px solid #cfc5b3;font-size:8.3pt;line-height:1.45}.effect b{color:#80533b}.score{margin-top:1.3mm;color:#736b5f;font-size:7.4pt;letter-spacing:.4px}
+    .storm{width:63mm;height:88mm}.storm .art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.72) contrast(.96)}.storm .fade{position:absolute;z-index:1;inset:0;background:linear-gradient(180deg,rgba(248,245,235,.95) 0,rgba(248,245,235,.5) 17mm,transparent 34mm,transparent 62mm,rgba(248,245,235,.92) 80mm,var(--paper))}.storm .top{position:absolute;z-index:2;top:5mm;left:5mm;right:5mm}.season{font-size:7pt;letter-spacing:2px;color:#59666a}.storm h3{margin:1mm 0 0;font:700 16pt/1.15 "Songti SC",SimSun,serif;letter-spacing:1px}.storm .rules{position:absolute;z-index:2;left:5mm;right:5mm;bottom:5mm}.target{font:700 12pt/1.2 "Songti SC",SimSun,serif;color:#3f4f53}.storm .rules p{margin:1.2mm 0 0;font-size:7.8pt;line-height:1.4;color:#5d5b55}.density{margin-top:2mm;font-size:6.8pt;color:#827a6e;letter-spacing:.5px}
+    .caption{margin:10px 0 4px;color:#6a645b;font-size:12px}.three{display:grid;grid-template-columns:repeat(3,max-content);gap:18px;align-items:start}.legend{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.legend div{padding:12px;background:#f3eee3}.legend b{display:block;color:#6f4b39}.file-list{columns:2}.file-list code{font-size:12px}
+    @media(max-width:900px){.three{display:flex;flex-wrap:wrap}.legend{grid-template-columns:1fr}.file-list{columns:1}h1{font-size:32px}.deity,.storm{transform-origin:top left}}
+    @page{size:A4;margin:8mm}@media print{html,body{background:#fff}header,.screen-only{display:none}main{padding:0;max-width:none}section{border:0;margin:0;padding:0;background:#fff}.print-break{break-before:page}.cards{gap:6mm}.card{box-shadow:none;break-inside:avoid}.deity{outline:.15mm solid #e0d8c8}.storm{outline:.15mm solid #e0d8c8}}
+  </style>
+</head>
+<body>
+  <header>
+    <small>消逝的留白 · 微弱的余烬</small>
+    <h1>真名之火｜风格样张 V1</h1>
+    <p>用统一线刻、断线留白和单点矿物色，验证符号缩放、神牌焦点、三季温度与家庭喷墨打印的兼容性。</p>
+  </header>
+  <main>
+    <section class="screen-only">
+      <h2>符号母版</h2>
+      <object class="symbol-board" data="符号母版_v1.svg" type="image/svg+xml" aria-label="五语素与六萨满纹章母版"></object>
+      <div class="scale-row">
+        <div class="scale-set"><b>10 mm</b><span class="chip s bone"><svg><use href="符号母版_v1.svg#bone"/></svg></span><span class="chip s wind"><svg><use href="符号母版_v1.svg#wind"/></svg></span><span class="chip s tide"><svg><use href="符号母版_v1.svg#tide"/></svg></span><span class="chip s fire"><svg><use href="符号母版_v1.svg#fire"/></svg></span><span class="chip s star"><svg><use href="符号母版_v1.svg#star"/></svg></span></div>
+        <div class="scale-set"><b>18 mm</b><span class="chip m bone"><svg><use href="符号母版_v1.svg#bone"/></svg></span><span class="chip m wind"><svg><use href="符号母版_v1.svg#wind"/></svg></span><span class="chip m tide"><svg><use href="符号母版_v1.svg#tide"/></svg></span><span class="chip m fire"><svg><use href="符号母版_v1.svg#fire"/></svg></span><span class="chip m star"><svg><use href="符号母版_v1.svg#star"/></svg></span></div>
+      </div>
+      <p class="note">判断标准：缩到 10 mm 后仍能只看轮廓区分；转为灰度后不依赖颜色；六枚萨满纹章与五语素不共用主轮廓。</p>
+    </section>
+
+    <section class="print-break">
+      <h2 class="screen-only">神牌样卡 · 90 × 85 mm</h2>
+      <div class="cards">
+        <article class="card deity">
+          <img class="art" src="神明_毛伊_母图_v1.png" alt="骨质神钩从海中拖起新生岛屿">
+          <div class="veil"></div><div class="top"><span>神话 · 01</span><span>毛利</span></div>
+          <div class="body">
+            <div class="name-row"><div><h3>毛伊</h3><div class="latin">Māui</div></div><div class="runes"><span class="rune bone"><svg><use href="符号母版_v1.svg#bone"/></svg></span><span class="rune tide"><svg><use href="符号母版_v1.svg#tide"/></svg></span><span class="rune wind"><svg><use href="符号母版_v1.svg#wind"/></svg></span></div></div>
+            <div class="effect"><b>神恩／遗赠</b>　将自己的一张供奉及印记移到另一神的匹配空槽；补满时视你为收尾者。</div>
+            <div class="score">唤醒 5　｜　安魂 3 → 遗赠已用 2</div>
+          </div>
+        </article>
+        <article class="card deity">
+          <img class="art" src="神明_火姥神_母图_v1.png" alt="阿伊努传统居所内的炉火与白烟">
+          <div class="veil"></div><div class="top"><span>神话 · 05</span><span>阿伊努</span></div>
+          <div class="body">
+            <div class="name-row"><div><h3>火姥神</h3><div class="latin">Ape-huci-kamuy</div></div><div class="runes"><span class="rune bone"><svg><use href="符号母版_v1.svg#bone"/></svg></span><span class="rune fire"><svg><use href="符号母版_v1.svg#fire"/></svg></span><span class="rune star"><svg><use href="符号母版_v1.svg#star"/></svg></span></div></div>
+            <div class="effect"><b>神恩／遗赠</b>　自己的心智上限恢复一点，并摸一张牌。</div>
+            <div class="score">唤醒 5　｜　安魂 3 → 遗赠已用 2</div>
+          </div>
+        </article>
+      </div>
+      <p class="caption screen-only">插画通过渐隐进入规则区，没有硬边框；语素槽保持完整轮廓，供奉印记压放后仍不遮住神恩正文。</p>
+    </section>
+
+    <section class="print-break">
+      <h2 class="screen-only">三季风暴 · 63 × 88 mm</h2>
+      <div class="three">
+        <article class="card storm"><img class="art" src="风暴_初冬_白霜_v1.png" alt="留白宽阔的初冬荒原"><div class="fade"></div><div class="top"><span class="season">初冬</span><h3>白霜</h3></div><div class="rules"><div class="target">神座一 · 风化 +1</div><p>霜线从无声处爬近。</p><div class="density">疏线 · 无严寒</div></div></article>
+        <article class="card storm"><img class="art" src="风暴_深冬_冻河_v1.png" alt="冰层破裂的深冬河谷"><div class="fade"></div><div class="top"><span class="season">深冬</span><h3>冻河</h3></div><div class="rules"><div class="target">神座二 · 风化 +1</div><p>弃一张牌，或燃烧一张。</p><div class="density">密线 · 严寒</div></div></article>
+        <article class="card storm"><img class="art" src="风暴_极夜_黑潮_v1.png" alt="黑潮侵入冰原的极夜海岸"><div class="fade"></div><div class="top"><span class="season">极夜</span><h3>黑潮</h3></div><div class="rules"><div class="target">神座一、二 · 各 +1</div><p>每位有手牌的萨满必须燃烧一张。</p><div class="density">交错密线 · 极夜严寒</div></div></article>
+      </div>
+      <div class="legend screen-only"><div><b>初冬</b>大面积纸色仍能呼吸，危险只在地表留下细小迹象。</div><div><b>深冬</b>地景结构被冰裂和横风切开，线条开始压缩空间。</div><div><b>极夜</b>交叉线成为主体，但保留纸色裂隙，避免满版黑墨。</div></div>
+    </section>
+
+    <section class="screen-only">
+      <h2>本轮判断</h2>
+      <ul><li>毛伊的矿物色集中在神钩；火姥神集中在炉火，神牌之间保持单一视觉焦点。</li><li>两张神牌的线刻细密度目前不同：火姥神室内略重，正式批量前应统一暗部上限。</li><li>极夜比初冬明显更密，但仍保留约一半纸色，适合作为 G3812 的第一次实印验证。</li><li>卡面不使用强边框；手工裁切产生轻微偏差时，渐隐边缘不会形成明显歪斜。</li></ul>
+    </section>
+  </main>
+</body>
+</html>
