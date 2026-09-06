@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360">
+  <style>
+    svg{color:#263830}.bg{fill:#fbf6e9}.ink{fill:none;stroke:currentColor;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}.fine{stroke-width:2}.dot{fill:currentColor;stroke:none}.label{font:16px 'Microsoft YaHei',sans-serif;fill:#263830;text-anchor:middle}.sub{font:12px 'Microsoft YaHei',sans-serif;fill:#7b7468;text-anchor:middle}
+  </style>
+  <rect class="bg" width="720" height="360"/>
+  <defs>
+    <symbol id="bone" viewBox="0 0 64 64"><g class="ink"><path d="M19 18c-5-5-11 1-7 6l5 5-5 5c-4 5 2 11 7 6l6-6h14l6 6c5 5 11-1 7-6l-5-5 5-5c4-5-2-11-7-6l-6 6H25z"/><path class="fine" d="M27 25l-4 8m14-8 4 8M30 29h4"/></g></symbol>
+    <symbol id="wind" viewBox="0 0 64 64"><g class="ink"><path d="M10 24h30c11 0 12-14 2-14-6 0-7 5-5 8"/><path d="M8 33h40c10 0 10 14 1 14-6 0-7-5-5-8"/><path class="fine" d="M14 42h20M15 17h12"/></g></symbol>
+    <symbol id="tide" viewBox="0 0 64 64"><g class="ink"><path d="M32 8c9 13 15 20 15 29a15 15 0 0 1-30 0c0-9 6-16 15-29z"/><path d="M7 50c7-5 12 5 19 0s12 5 19 0 10 1 12 3"/><path class="fine" d="M23 37c1 5 4 7 9 8"/></g></symbol>
+    <symbol id="fire" viewBox="0 0 64 64"><g class="ink"><path d="M32 7c3 11 14 16 14 30a14 14 0 0 1-28 0c0-9 5-15 12-23 0 7 3 10 6 13 1-8-1-13-4-20z"/><path d="M32 29c5 5 7 9 5 14a6 6 0 0 1-11-2c0-4 2-7 6-12z"/><path class="fine" d="M16 52h32"/></g></symbol>
+    <symbol id="star" viewBox="0 0 64 64"><g class="ink"><path d="M32 8l5 18 17 6-17 6-5 18-5-18-17-6 17-6z"/><circle class="dot" cx="51" cy="13" r="2.2"/><circle class="dot" cx="12" cy="47" r="2.2"/><path class="fine" d="M45 49l4 4m-34-38 4 4"/></g></symbol>
+    <symbol id="ferryman" viewBox="0 0 64 64"><g class="ink"><path d="M15 54V19h34v35M22 54V28h20v26M9 54h46"/><path d="M24 41h17m-6-6 6 6-6 6"/><circle class="dot" cx="21" cy="41" r="3"/></g></symbol>
+    <symbol id="winter-listener" viewBox="0 0 64 64"><g class="ink"><path d="M18 18c21-10 34 2 28 18-4 10-14 8-14 18"/><path d="M32 54c-9 0-14-8-10-16 3-6 10-6 13-2"/><path class="fine" d="M10 20c6 2 9 0 12-4m28 3c-5 3-8 2-11-1"/><circle class="dot" cx="32" cy="55" r="2.5"/></g></symbol>
+    <symbol id="bone-carver" viewBox="0 0 64 64"><g class="ink"><path d="M20 12c-4-4-9 1-6 5l5 5-5 5c-3 4 2 9 6 5l6-6h13l6 6c4 4 9-1 6-5l-5-5 5-5c3-4-2-9-6-5l-6 6H26z"/><path d="M19 46l26-13 3 6-26 13-7 1z"/><path class="fine" d="M28 19l8 6m-4-7-8 7"/></g></symbol>
+    <symbol id="fire-keeper" viewBox="0 0 64 64"><g class="ink"><path d="M11 42c8-2 12 2 21 9 9-7 13-11 21-9M14 50c7 0 11 2 18 7 7-5 11-7 18-7"/><path d="M32 10c2 8 10 12 10 22a10 10 0 0 1-20 0c0-7 4-11 9-17 0 5 2 7 4 9 1-6-1-10-3-14z"/></g></symbol>
+    <symbol id="name-weaver" viewBox="0 0 64 64"><g class="ink"><path d="M12 19c12 0 12 26 24 26s12-26 20-26"/><path d="M12 45c12 0 12-26 24-26s12 26 20 26"/><path d="M12 32h44"/><circle class="dot" cx="12" cy="19" r="2.5"/><circle class="dot" cx="12" cy="45" r="2.5"/><circle class="dot" cx="56" cy="32" r="2.5"/></g></symbol>
+    <symbol id="path-asker" viewBox="0 0 64 64"><g class="ink"><path d="M32 56V35M32 35L16 19M32 35l16-16"/><path d="M16 19l-5 1m5-1-1 5M48 19l5 1m-5-1 1 5"/><path d="M32 8l2.5 6 6.5.5-5 4 1.5 6.5-5.5-3.5-5.5 3.5 1.5-6.5-5-4 6.5-.5z"/></g></symbol>
+  </defs>
+  <g transform="translate(34 28)">
+    <g transform="translate(0 0)"><svg width="90" height="90"><use href="#bone"/></svg><text class="label" x="45" y="110">骨</text></g>
+    <g transform="translate(135 0)"><svg width="90" height="90"><use href="#wind"/></svg><text class="label" x="45" y="110">风</text></g>
+    <g transform="translate(270 0)"><svg width="90" height="90"><use href="#tide"/></svg><text class="label" x="45" y="110">潮</text></g>
+    <g transform="translate(405 0)"><svg width="90" height="90"><use href="#fire"/></svg><text class="label" x="45" y="110">炎</text></g>
+    <g transform="translate(540 0)"><svg width="90" height="90"><use href="#star"/></svg><text class="label" x="45" y="110">星</text></g>
+  </g>
+  <g transform="translate(15 190) scale(.82)">
+    <g transform="translate(0 0)"><svg width="82" height="82"><use href="#ferryman"/></svg><text class="sub" x="41" y="102">渡魂人</text></g>
+    <g transform="translate(140 0)"><svg width="82" height="82"><use href="#winter-listener"/></svg><text class="sub" x="41" y="102">听冬者</text></g>
+    <g transform="translate(280 0)"><svg width="82" height="82"><use href="#bone-carver"/></svg><text class="sub" x="41" y="102">刻骨者</text></g>
+    <g transform="translate(420 0)"><svg width="82" height="82"><use href="#fire-keeper"/></svg><text class="sub" x="41" y="102">守火人</text></g>
+    <g transform="translate(560 0)"><svg width="82" height="82"><use href="#name-weaver"/></svg><text class="sub" x="41" y="102">织名者</text></g>
+    <g transform="translate(700 0)"><svg width="82" height="82"><use href="#path-asker"/></svg><text class="sub" x="41" y="102">问途者</text></g>
+  </g>
+</svg>
