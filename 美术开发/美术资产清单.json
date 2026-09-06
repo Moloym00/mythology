@@ -1,0 +1,419 @@
+{
+  "project": "真名之火",
+  "subtitle": "最后的火塘",
+  "rules_version": "V1.2",
+  "art_stage": "准备 0.1",
+  "rules_source": "../玩法书_V1.2.md",
+  "direction": {
+    "keywords": [
+      "火塘余光",
+      "记忆消逝",
+      "低墨版画",
+      "矿物色",
+      "辽阔留白"
+    ],
+    "rendering": "细线蚀刻与块面剪影结合，局部使用矿物色和火光；避免写实影视概念图质感。",
+    "deity_approach": "以环境、象征物和姿态建立神性，不依赖统一的正面人物肖像。",
+    "culture_rule": "每尊神使用其来源文化可核验的自然环境与叙事母题；不拼贴其他文化符号，不直接复刻神圣纹样。",
+    "print": "浅暖纸底、深色线稿、每张卡最多三种主色；重要信息不用纯色面积承载。"
+  },
+  "production": {
+    "bleed_mm": 3,
+    "safe_mm": 4,
+    "resolution_dpi": 300,
+    "sizes_mm": {
+      "memory_and_storm": "63×88",
+      "deity": "90×85",
+      "shaman_panel": "186×131"
+    },
+    "first_batch": [
+      "标题字标",
+      "五语素图形",
+      "六枚萨满纹章",
+      "毛伊与火姥神两张风格样卡",
+      "极夜·黑潮样卡",
+      "一张萨满面板样式"
+    ]
+  },
+  "elements": [
+    {
+      "id": "bone",
+      "name": "骨",
+      "color": "#A56A3A",
+      "anchor": "骨片、年轮、山脊",
+      "function": "风化增减"
+    },
+    {
+      "id": "wind",
+      "name": "风",
+      "color": "#58756D",
+      "anchor": "气流、羽线、回旋",
+      "function": "风暴预见与禁忌"
+    },
+    {
+      "id": "tide",
+      "name": "潮",
+      "color": "#386D78",
+      "anchor": "潮线、水滴、涟漪",
+      "function": "补充记忆"
+    },
+    {
+      "id": "fire",
+      "name": "炎",
+      "color": "#B8543D",
+      "anchor": "余烬、火舌、裂光",
+      "function": "保存心智"
+    },
+    {
+      "id": "star",
+      "name": "星",
+      "color": "#B28A45",
+      "anchor": "星路、光点、冠环",
+      "function": "获得余音"
+    }
+  ],
+  "deities": [
+    {
+      "id": "01",
+      "name": "毛伊",
+      "original": "Māui",
+      "culture": "毛利",
+      "elements": [
+        "骨",
+        "潮",
+        "风"
+      ],
+      "emblem": "穿过潮汐的神钩",
+      "brief": "神钩、海潮、初升岛屿；画面有向外拉扯的力量",
+      "status": "待概念"
+    },
+    {
+      "id": "02",
+      "name": "希内努伊特波",
+      "original": "Hine-nui-te-pō",
+      "culture": "毛利",
+      "elements": [
+        "骨",
+        "潮",
+        "星"
+      ],
+      "emblem": "长夜尽头的门",
+      "brief": "月、门与深夜；庄严安静，避免恐怖怪物化",
+      "status": "待概念"
+    },
+    {
+      "id": "03",
+      "name": "贝雅薇",
+      "original": "Beaivi",
+      "culture": "萨米",
+      "elements": [
+        "炎",
+        "星",
+        "风"
+      ],
+      "emblem": "驯鹿角托起白昼",
+      "brief": "低太阳、雪原、驯鹿角；画面由冷色向暖光展开",
+      "status": "待概念"
+    },
+    {
+      "id": "04",
+      "name": "霍拉加勒斯",
+      "original": "Horagalles",
+      "culture": "萨米",
+      "elements": [
+        "潮",
+        "风",
+        "星"
+      ],
+      "emblem": "山脊回应雷鼓",
+      "brief": "山脊、雷光、鼓面般的圆形回响；强调天气交换",
+      "status": "待概念"
+    },
+    {
+      "id": "05",
+      "name": "火姥神",
+      "original": "Ape-huci-kamuy",
+      "culture": "阿伊努",
+      "elements": [
+        "骨",
+        "炎",
+        "星"
+      ],
+      "emblem": "炉火记得归人",
+      "brief": "室内炉火、烟路、归来的空位；温暖且具有守望感",
+      "status": "待概念"
+    },
+    {
+      "id": "06",
+      "name": "村落守护神",
+      "original": "Kotan-kor-kamuy",
+      "culture": "阿伊努",
+      "elements": [
+        "骨",
+        "风",
+        "潮"
+      ],
+      "emblem": "枭眼守着村火",
+      "brief": "枭的凝视、林梢与村火；避免直接复制传统纹样",
+      "status": "待概念"
+    },
+    {
+      "id": "07",
+      "name": "埃舒",
+      "original": "Èṣù",
+      "culture": "约鲁巴",
+      "elements": [
+        "风",
+        "炎",
+        "星"
+      ],
+      "emblem": "四方道路皆有回声",
+      "brief": "四向路口、门槛、双重方向；构图带机敏与转折",
+      "status": "待概念"
+    },
+    {
+      "id": "08",
+      "name": "奥贡",
+      "original": "Ògún",
+      "culture": "约鲁巴",
+      "elements": [
+        "骨",
+        "炎",
+        "风"
+      ],
+      "emblem": "铁与道路一同醒来",
+      "brief": "铁、锤击火花、被劈开的道路；力量集中但不做通用战神",
+      "status": "待概念"
+    },
+    {
+      "id": "09",
+      "name": "玉米神",
+      "original": "Maya Maize God",
+      "culture": "玛雅",
+      "elements": [
+        "骨",
+        "潮",
+        "炎"
+      ],
+      "emblem": "旧土托住新芽",
+      "brief": "玉米穗、种子、土地层次；生命循环而非丰收装饰",
+      "status": "待概念"
+    },
+    {
+      "id": "10",
+      "name": "雨神",
+      "original": "Chahk",
+      "culture": "玛雅",
+      "elements": [
+        "潮",
+        "风",
+        "星"
+      ],
+      "emblem": "雨沿雷纹落下",
+      "brief": "厚雨云、雷光、水面；同时具有滋养与侵蚀",
+      "status": "待概念"
+    },
+    {
+      "id": "11",
+      "name": "乌伦·阿尔·托伊恩",
+      "original": "Ürüng Aar Toyon",
+      "culture": "萨哈",
+      "elements": [
+        "骨",
+        "炎",
+        "星"
+      ],
+      "emblem": "九颗天星照临世界树",
+      "brief": "高空、九颗星、世界树般的垂直结构；留出辽阔空白",
+      "status": "待概念"
+    },
+    {
+      "id": "12",
+      "name": "巴亚奈",
+      "original": "Bayanay",
+      "culture": "萨哈",
+      "elements": [
+        "炎",
+        "潮",
+        "风"
+      ],
+      "emblem": "鹿角引向雪林深处",
+      "brief": "鹿角、兽迹、雪林纵深；画面像追踪一条将消失的路",
+      "status": "待概念"
+    }
+  ],
+  "shamans": [
+    {
+      "id": "01",
+      "name": "渡魂人",
+      "sigil": "渡门",
+      "brief": "两道岸线围住一叶舟；图形强调移动与渡越",
+      "status": "待设计"
+    },
+    {
+      "id": "02",
+      "name": "听冬者",
+      "sigil": "冰裂",
+      "brief": "同心冰纹被一条细裂贯穿；图形强调预见",
+      "status": "待设计"
+    },
+    {
+      "id": "03",
+      "name": "刻骨者",
+      "sigil": "骨刻",
+      "brief": "骨片上的三道刻痕；图形强调替代与铭刻",
+      "status": "待设计"
+    },
+    {
+      "id": "04",
+      "name": "守火人",
+      "sigil": "捧火",
+      "brief": "双手般的弧线托住一枚余烬；图形强调抢救",
+      "status": "待设计"
+    },
+    {
+      "id": "05",
+      "name": "织名者",
+      "sigil": "绳结",
+      "brief": "三股线在中心结为一个名字；图形强调连结",
+      "status": "待设计"
+    },
+    {
+      "id": "06",
+      "name": "问途者",
+      "sigil": "岔路星",
+      "brief": "岔路末端悬一颗星；图形强调一次性的选择",
+      "status": "待设计"
+    }
+  ],
+  "storms": [
+    {
+      "id": "01",
+      "name": "初冬·白霜",
+      "targets": "1",
+      "status": "待设计"
+    },
+    {
+      "id": "02",
+      "name": "初冬·薄冰",
+      "targets": "2",
+      "status": "待设计"
+    },
+    {
+      "id": "03",
+      "name": "初冬·远风",
+      "targets": "3",
+      "status": "待设计"
+    },
+    {
+      "id": "04",
+      "name": "初冬·雪痕",
+      "targets": "4",
+      "status": "待设计"
+    },
+    {
+      "id": "05",
+      "name": "深冬·凛夜",
+      "targets": "1",
+      "status": "待设计"
+    },
+    {
+      "id": "06",
+      "name": "深冬·冻河",
+      "targets": "2",
+      "status": "待设计"
+    },
+    {
+      "id": "07",
+      "name": "深冬·寒林",
+      "targets": "3",
+      "status": "待设计"
+    },
+    {
+      "id": "08",
+      "name": "深冬·无月",
+      "targets": "4",
+      "status": "待设计"
+    },
+    {
+      "id": "09",
+      "name": "极夜·横雪",
+      "targets": "1、3",
+      "status": "待设计"
+    },
+    {
+      "id": "10",
+      "name": "极夜·断灯",
+      "targets": "2、4",
+      "status": "待设计"
+    },
+    {
+      "id": "11",
+      "name": "极夜·黑潮",
+      "targets": "1、2",
+      "status": "待设计"
+    },
+    {
+      "id": "12",
+      "name": "极夜·长眠",
+      "targets": "3、4",
+      "status": "待设计"
+    }
+  ],
+  "shared_assets": [
+    {
+      "id": "logo",
+      "name": "《真名之火》标题字标",
+      "count": 1,
+      "priority": "P0"
+    },
+    {
+      "id": "element_icons",
+      "name": "五语素图形",
+      "count": 5,
+      "priority": "P0"
+    },
+    {
+      "id": "shaman_sigils",
+      "name": "萨满纹章",
+      "count": 6,
+      "priority": "P0"
+    },
+    {
+      "id": "deity_art",
+      "name": "神明主视觉",
+      "count": 12,
+      "priority": "P1"
+    },
+    {
+      "id": "storm_art",
+      "name": "风暴主视觉",
+      "count": 12,
+      "priority": "P1"
+    },
+    {
+      "id": "card_frames",
+      "name": "记忆／神明／风暴／萨满版式",
+      "count": 4,
+      "priority": "P1"
+    },
+    {
+      "id": "card_backs",
+      "name": "记忆／神明／风暴牌背",
+      "count": 3,
+      "priority": "P1"
+    },
+    {
+      "id": "table_tokens",
+      "name": "供奉、风化、心智、禁忌与神座图形",
+      "count": 13,
+      "priority": "P2"
+    },
+    {
+      "id": "cover",
+      "name": "封面主视觉",
+      "count": 1,
+      "priority": "P2"
+    }
+  ]
+}

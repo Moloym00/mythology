@@ -1,0 +1,1150 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>真名之火 · 最小样张设计与打印（博物学蚀刻版）</title>
+  <style>
+    :root {
+      --paper: #FAF6ED;
+      --paper-card: #FAF5EA;
+      --ink: #2C261F;
+      --ink-soft: #5C5549;
+      --ink-muted: #8C8272;
+      --line: #D9D0BE;
+      --line-subtle: #ECE6D8;
+      
+      /* 五语素矿物色 (微调匹配古籍水洗质感) */
+      --bone: #8C5832;
+      --wind: #4D6960;
+      --tide: #325B64;
+      --fire: #A24230;
+      --star: #9A7736;
+    }
+
+    * { box-sizing: border-box; }
+    
+    body {
+      margin: 0;
+      background: #EFEAE0;
+      color: var(--ink);
+      font-family: "PingFang SC", "Noto Serif SC", "Songti SC", "SimSun", serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* 顶部控制栏 */
+    header.toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(250, 246, 237, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--line);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(44, 38, 31, 0.05);
+    }
+    .brand {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .brand h1 {
+      font-size: 20px;
+      margin: 0;
+      letter-spacing: 3px;
+      font-weight: 700;
+    }
+    .brand span {
+      font-size: 13px;
+      color: var(--ink-soft);
+      letter-spacing: 1px;
+    }
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    button, .tab-btn {
+      background: #FFFDF9;
+      border: 1px solid var(--line);
+      color: var(--ink);
+      padding: 7px 16px;
+      border-radius: 4px;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s ease;
+    }
+    button:hover, .tab-btn:hover {
+      background: #F2ECDC;
+      border-color: var(--ink-muted);
+    }
+    .tab-btn.active {
+      background: var(--ink);
+      color: #FAF6ED;
+      border-color: var(--ink);
+    }
+    .print-btn {
+      background: #A24230;
+      color: #FFFDF9;
+      border-color: #8C3524;
+      font-weight: bold;
+    }
+    .print-btn:hover {
+      background: #8C3524;
+    }
+
+    /* 页面容器 */
+    main {
+      max-width: 1200px;
+      margin: 28px auto;
+      padding: 0 20px 80px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      margin: 32px 0 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      letter-spacing: 2px;
+    }
+    .section-title small {
+      font-size: 12px;
+      color: var(--ink-muted);
+      font-family: sans-serif;
+      letter-spacing: 0;
+    }
+
+    /* 视图切换 */
+    .view-panel { display: none; }
+    .view-panel.active { display: block; }
+
+    /* ===================================================
+       1. 矢量符号与纹章库
+       =================================================== */
+    .icon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+    .icon-card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 16px;
+      text-align: center;
+      position: relative;
+    }
+    .icon-card svg {
+      width: 54px;
+      height: 54px;
+      margin: 10px auto;
+      display: block;
+    }
+    .icon-card b {
+      display: block;
+      font-size: 16px;
+      letter-spacing: 2px;
+      margin-top: 8px;
+    }
+    .icon-card em {
+      font-style: normal;
+      font-size: 12px;
+      color: var(--ink-soft);
+      display: block;
+      margin: 4px 0;
+    }
+    .icon-card .desc {
+      font-size: 11px;
+      color: var(--ink-muted);
+      line-height: 1.4;
+      margin-top: 6px;
+      text-align: left;
+      border-top: 1px dashed var(--line-subtle);
+      padding-top: 6px;
+    }
+    .token-preview {
+      display: inline-block;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: #FFFDF9;
+      padding: 3px;
+      vertical-align: middle;
+      margin-top: 6px;
+    }
+    .token-preview svg {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+    }
+
+    /* ===================================================
+       2. 神牌组件样式 (90mm x 85mm 扁方卡)
+       =================================================== */
+    .cards-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 28px;
+      justify-content: center;
+      margin: 24px 0 40px;
+    }
+
+    .god-card {
+      width: 90mm;
+      height: 85mm;
+      background: var(--paper-card);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 14px rgba(44, 38, 31, 0.08);
+      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .god-card.dying {
+      transform: rotate(90deg) scale(0.92);
+      box-shadow: 0 8px 24px rgba(162, 66, 48, 0.2);
+      outline: 2px dashed #A24230;
+    }
+
+    .god-art {
+      height: 48mm;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+      background: #F5EFEB;
+    }
+    .god-art img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 30%;
+      display: block;
+      filter: contrast(1.02);
+    }
+    .god-art::after {
+      content: "";
+      position: absolute;
+      left: 0; bottom: 0; right: 0;
+      height: 14mm;
+      background: linear-gradient(to bottom, rgba(250, 245, 234, 0) 0%, rgba(250, 245, 234, 0.85) 75%, var(--paper-card) 100%);
+    }
+
+    .god-meta {
+      position: absolute;
+      top: 6mm;
+      left: 6mm;
+      z-index: 2;
+      text-shadow: 0 0 6px rgba(250, 245, 234, 0.95), 0 0 2px rgba(250, 245, 234, 1);
+    }
+    .god-culture {
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--ink-muted);
+      display: block;
+      text-transform: uppercase;
+    }
+    .god-name {
+      font-size: 20px;
+      margin: 1px 0 0;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+    .god-name em {
+      font-size: 11px;
+      font-style: italic;
+      font-weight: normal;
+      color: var(--ink-soft);
+      margin-left: 5px;
+      letter-spacing: 0;
+    }
+
+    .god-slots {
+      position: absolute;
+      top: 6mm;
+      right: 6mm;
+      z-index: 2;
+      display: flex;
+      gap: 5px;
+    }
+    .slot-badge {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(250, 246, 237, 0.9);
+      border: 1px solid var(--ink-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .slot-badge svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    .god-content {
+      flex: 1;
+      padding: 0 6mm 4mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      z-index: 3;
+    }
+    .god-ability {
+      font-size: 11.5px;
+      line-height: 1.45;
+      color: var(--ink);
+      border-top: 1px solid rgba(217, 208, 190, 0.6);
+      padding-top: 5px;
+      margin-top: -2px;
+    }
+    .god-ability b {
+      color: var(--fire);
+      margin-right: 4px;
+      font-size: 11px;
+    }
+    .god-lore {
+      font-size: 9.5px;
+      line-height: 1.35;
+      color: var(--ink-muted);
+      font-style: italic;
+      border-top: 1px dashed var(--line-subtle);
+      padding-top: 3px;
+      margin-top: 3px;
+      letter-spacing: 0.5px;
+    }
+
+    /* ===================================================
+       3. 风暴牌组件样式 (63mm x 88mm 标准欧式牌)
+       =================================================== */
+    .storm-card {
+      width: 63mm;
+      height: 88mm;
+      background: var(--paper-card);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 14px rgba(44, 38, 31, 0.08);
+    }
+    .storm-art {
+      height: 52mm;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+      background: #F3ECE1;
+    }
+    .storm-art img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 25%;
+      display: block;
+    }
+    .storm-art::after {
+      content: "";
+      position: absolute;
+      left: 0; bottom: 0; right: 0;
+      height: 12mm;
+      background: linear-gradient(to bottom, rgba(250, 245, 234, 0) 0%, rgba(250, 245, 234, 0.9) 75%, var(--paper-card) 100%);
+    }
+
+    .storm-header {
+      position: absolute;
+      top: 5mm;
+      left: 5mm;
+      right: 5mm;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      z-index: 2;
+      text-shadow: 0 0 5px rgba(250, 245, 234, 0.95);
+    }
+    .storm-season {
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      color: var(--ink-soft);
+      font-weight: 600;
+    }
+    .storm-targets {
+      display: flex;
+      gap: 3px;
+    }
+    .target-badge {
+      display: inline-block;
+      width: 19px;
+      height: 19px;
+      line-height: 18px;
+      text-align: center;
+      font-size: 11px;
+      font-weight: bold;
+      border: 1px solid var(--ink);
+      background: rgba(250, 245, 234, 0.95);
+      border-radius: 3px;
+      color: var(--ink);
+    }
+
+    .storm-name-block {
+      position: absolute;
+      top: 11mm;
+      left: 5mm;
+      z-index: 2;
+      text-shadow: 0 0 5px rgba(250, 245, 234, 0.95);
+    }
+    .storm-name {
+      font-size: 18px;
+      margin: 0;
+      letter-spacing: 2px;
+      font-weight: 700;
+    }
+
+    .storm-body {
+      flex: 1;
+      padding: 0 5mm 4mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      z-index: 3;
+    }
+    .storm-rule {
+      font-size: 10.5px;
+      line-height: 1.45;
+      color: var(--ink);
+      border-top: 1px solid rgba(217, 208, 190, 0.6);
+      padding-top: 4px;
+    }
+    .chill-tag {
+      display: inline-block;
+      padding: 1px 4px;
+      font-size: 9.5px;
+      background: #ECE5D5;
+      border-radius: 2px;
+      border: 1px solid #D5CBB5;
+      color: #7A3525;
+      margin-right: 4px;
+      font-weight: bold;
+    }
+    .storm-lore {
+      font-size: 9px;
+      color: var(--ink-muted);
+      font-style: italic;
+      border-top: 1px dashed var(--line-subtle);
+      padding-top: 3px;
+      margin-top: 2px;
+    }
+
+    /* ===================================================
+       4. 打印排版与裁切标记 (A4 页面设置)
+       =================================================== */
+    .print-sheet {
+      width: 210mm;
+      min-height: 297mm;
+      padding: 10mm;
+      margin: 0 auto 30px;
+      background: #FAF6ED;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    .print-header-tip {
+      font-size: 11px;
+      color: var(--ink-muted);
+      border-bottom: 1px dashed var(--line);
+      padding-bottom: 6px;
+      margin-bottom: 8mm;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .a4-grid-page1 {
+      display: grid;
+      grid-template-columns: repeat(2, 90mm);
+      gap: 6mm 10mm;
+      justify-content: center;
+    }
+    .a4-grid-storms {
+      display: grid;
+      grid-template-columns: repeat(3, 63mm);
+      gap: 6mm;
+      justify-content: center;
+      margin-top: 8mm;
+    }
+
+    .crop-wrap {
+      position: relative;
+      display: inline-block;
+    }
+    .corner-mark {
+      position: absolute;
+      width: 4mm;
+      height: 4mm;
+      pointer-events: none;
+      border-color: #A89D88;
+      border-style: solid;
+    }
+    .corner-tl { top: -2mm; left: -2mm; border-width: 0.5px 0 0 0.5px; }
+    .corner-tr { top: -2mm; right: -2mm; border-width: 0.5px 0.5px 0 0; }
+    .corner-bl { bottom: -2mm; left: -2mm; border-width: 0 0 0.5px 0.5px; }
+    .corner-br { bottom: -2mm; right: -2mm; border-width: 0 0.5px 0.5px 0; }
+
+    .tokens-print-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 26mm);
+      gap: 6mm 4mm;
+      justify-content: center;
+      margin-top: 10mm;
+    }
+    .print-token-unit {
+      width: 24mm;
+      height: 24mm;
+      border-radius: 50%;
+      border: 0.5px dashed #A89D88;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #FFFDF9;
+      position: relative;
+    }
+    .print-token-unit svg {
+      width: 14mm;
+      height: 14mm;
+    }
+    .print-token-unit span {
+      font-size: 8px;
+      color: var(--ink-muted);
+      position: absolute;
+      bottom: 1mm;
+      letter-spacing: 0.5px;
+    }
+
+    @media print {
+      body {
+        background: #FFF;
+      }
+      header.toolbar, .no-print {
+        display: none !important;
+      }
+      main {
+        margin: 0;
+        padding: 0;
+        max-width: none;
+      }
+      .view-panel {
+        display: none !important;
+      }
+      #view-print {
+        display: block !important;
+      }
+      .print-sheet {
+        box-shadow: none;
+        margin: 0;
+        padding: 8mm 6mm;
+        page-break-after: always;
+        break-after: page;
+        background: #FAF6ED !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="toolbar no-print">
+    <div class="brand">
+      <h1>真名之火</h1>
+      <span>最小样张 · 博物学钢版微雕手稿</span>
+    </div>
+    <div class="btn-group">
+      <button class="tab-btn active" onclick="switchTab('overview')">样张总览</button>
+      <button class="tab-btn" onclick="switchTab('gods')">神牌工坊 (测试横置)</button>
+      <button class="tab-btn" onclick="switchTab('storms')">风暴牌</button>
+      <button class="tab-btn" onclick="switchTab('vectors')">语素与萨满纹章 (SVG)</button>
+      <button class="tab-btn" onclick="switchTab('print')">A4打印排版 (G3812)</button>
+      <button class="print-btn" onclick="window.print()">调用打印机</button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- 视图 1: 样张总览 -->
+    <div id="view-overview" class="view-panel active">
+      <div class="section-title">
+        <span>两尊神牌样张 (90 × 85 mm)</span>
+        <small>低墨钢版蚀刻 · 宣纸暖底渐隐 · 对应语素槽位</small>
+      </div>
+      <div class="cards-row">
+        <!-- 毛伊 -->
+        <div class="god-card">
+          <div class="god-art">
+            <img src="images/maui_master.jpg" alt="毛伊·穿过潮汐的神钩">
+          </div>
+          <div class="god-meta">
+            <span class="god-culture">毛利 · Māui</span>
+            <h3 class="god-name">毛伊</h3>
+          </div>
+          <div class="god-slots">
+            <div class="slot-badge" title="骨"><svg viewBox="0 0 40 40"><path d="M10 20 L20 12 L30 20 L20 28 Z M20 6 L20 12 M20 28 L20 34 M14 17 L26 23 M14 23 L26 17" fill="none" stroke="#8C5832" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+            <div class="slot-badge" title="潮"><svg viewBox="0 0 40 40"><path d="M8 24 C14 18 26 18 32 24 M12 28 C16 23 24 23 28 28 M16 16 C18 12 22 12 24 16" fill="none" stroke="#325B64" stroke-width="2.2" stroke-linecap="round"/></svg></div>
+            <div class="slot-badge" title="风"><svg viewBox="0 0 40 40"><path d="M8 20 Q16 12 25 15 T26 26 Q18 28 15 22 T25 18" fill="none" stroke="#4D6960" stroke-width="2.2" stroke-linecap="round"/></svg></div>
+          </div>
+          <div class="god-content">
+            <div class="god-ability">
+              <b>神恩／遗赠</b>将自己的一张供奉及印记移到另一神的匹配空槽；补满时视你为收尾者。
+            </div>
+            <div class="god-lore">
+              “海仍在潮起潮落，人们却忘了岛屿曾从哪里升起。”
+            </div>
+          </div>
+        </div>
+
+        <!-- 火姥神 -->
+        <div class="god-card">
+          <div class="god-art">
+            <img src="images/ape_huci_master.jpg" alt="火姥神·炉火记得归人">
+          </div>
+          <div class="god-meta">
+            <span class="god-culture">阿伊努 · Ape-huci-kamuy</span>
+            <h3 class="god-name">火姥神</h3>
+          </div>
+          <div class="god-slots">
+            <div class="slot-badge" title="骨"><svg viewBox="0 0 40 40"><path d="M10 20 L20 12 L30 20 L20 28 Z M20 6 L20 12 M20 28 L20 34 M14 17 L26 23 M14 23 L26 17" fill="none" stroke="#8C5832" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+            <div class="slot-badge" title="炎"><svg viewBox="0 0 40 40"><path d="M20 7 C20 7 15 15 15 22 A5 5 0 0 0 25 22 C25 17 20 7 20 7 Z M15 24 C12 21 11 17 11 17 C11 17 7 21 7 26 A6 6 0 0 0 17 29 C16 27 15 24 15 24 Z M25 24 C28 21 29 17 29 17 C29 17 33 21 33 26 A6 6 0 0 1 23 29 C24 27 25 24 25 24 Z" fill="none" stroke="#A24230" stroke-width="2" stroke-linejoin="round"/></svg></div>
+            <div class="slot-badge" title="星"><svg viewBox="0 0 40 40"><path d="M20 5 L20 35 M5 20 L35 20 M9 9 L31 31 M9 31 L31 9" stroke="#9A7736" stroke-width="1.8" stroke-linecap="round"/><circle cx="20" cy="20" r="5" fill="none" stroke="#9A7736" stroke-width="2"/></svg></div>
+          </div>
+          <div class="god-content">
+            <div class="god-ability">
+              <b>神恩／遗赠</b>自己的心智上限恢复一点，并摸一张牌。
+            </div>
+            <div class="god-lore">
+              “炉火仍然燃烧，人们却忘了为归来者留一个位置。”
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title">
+        <span>三季风暴牌样张 (63 × 88 mm)</span>
+        <small>初冬（白霜）· 深冬（冻河）· 极夜（黑潮）</small>
+      </div>
+      <div class="cards-row">
+        <!-- 初冬·白霜 -->
+        <div class="storm-card">
+          <div class="storm-art">
+            <img src="images/storm_white_frost_master.jpg" alt="初冬·白霜">
+          </div>
+          <div class="storm-header">
+            <span class="storm-season">初冬 · EARLY WINTER</span>
+            <div class="storm-targets"><span class="target-badge" title="影响1号神座">1</span></div>
+          </div>
+          <div class="storm-name-block">
+            <h3 class="storm-name">白霜</h3>
+          </div>
+          <div class="storm-body">
+            <div class="storm-rule">
+              依次为 <b>1</b> 号神座增加一点风化。<br>此风暴无严寒。
+            </div>
+            <div class="storm-lore">
+              “远山披上第一道白霜，寒意在荒原上无声弥散。”
+            </div>
+          </div>
+        </div>
+
+        <!-- 深冬·冻河 -->
+        <div class="storm-card">
+          <div class="storm-art">
+            <img src="images/storm_frozen_river_master.jpg" alt="深冬·冻河">
+          </div>
+          <div class="storm-header">
+            <span class="storm-season">深冬 · MID WINTER</span>
+            <div class="storm-targets"><span class="target-badge" title="影响2号神座">2</span></div>
+          </div>
+          <div class="storm-name-block">
+            <h3 class="storm-name">冻河</h3>
+          </div>
+          <div class="storm-body">
+            <div class="storm-rule">
+              依次为 <b>2</b> 号神座增加一点风化。<br>
+              <span class="chill-tag">严寒</span> 每位有手牌的玩家选择弃一张，或燃烧一张。
+            </div>
+            <div class="storm-lore">
+              “碎冰在河道中死寂，寒气咬碎了最后的流动。”
+            </div>
+          </div>
+        </div>
+
+        <!-- 极夜·黑潮 -->
+        <div class="storm-card">
+          <div class="storm-art">
+            <img src="images/storm_black_tide_master.jpg" alt="极夜·黑潮">
+          </div>
+          <div class="storm-header">
+            <span class="storm-season">极夜 · POLAR NIGHT</span>
+            <div class="storm-targets"><span class="target-badge">1</span><span class="target-badge">2</span></div>
+          </div>
+          <div class="storm-name-block">
+            <h3 class="storm-name">黑潮</h3>
+          </div>
+          <div class="storm-body">
+            <div class="storm-rule">
+              首张极夜先结算<b>极夜合诵</b>。依次为 <b>1、2</b> 号神座各增加一点风化。<br>
+              <span class="chill-tag">严寒</span> 每位有手牌的玩家必须燃烧一张。
+            </div>
+            <div class="storm-lore">
+              “天穹塌落如巨浪，黑色冰潮席卷了最后的岸线。”
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 视图 2: 神牌工坊 -->
+    <div id="view-gods" class="view-panel">
+      <div class="section-title">
+        <span>神牌状态交互测试</span>
+        <small>点击按钮切换“正常在场”与“濒死横置（两点风化）”状态</small>
+      </div>
+      <p style="font-size:13px; color:var(--ink-soft); line-height:1.6;">
+        在《真名之火》规则中，神牌在积累两点风化后需要<b>横置</b>提示濒死。本版式保证在横置 90° 后，神牌左上角的真名槽、名称和神恩遗赠依然清晰可读。
+      </p>
+      <div style="text-align: center; margin: 20px 0;">
+        <button onclick="toggleDying()" style="padding: 10px 24px; font-weight: bold; background: #FFFDF9; border: 1.5px solid #A24230; color: #A24230;">
+          ↺ 点击切换：横置（濒死）／ 竖置（苏醒）
+        </button>
+      </div>
+
+      <div class="cards-row" style="min-height: 110mm; align-items: center;">
+        <div class="god-card interactive-god">
+          <div class="god-art"><img src="images/maui_master.jpg" alt="毛伊"></div>
+          <div class="god-meta">
+            <span class="god-culture">毛利 · Māui</span>
+            <h3 class="god-name">毛伊</h3>
+          </div>
+          <div class="god-slots">
+            <div class="slot-badge"><svg viewBox="0 0 40 40"><path d="M10 20 L20 12 L30 20 L20 28 Z M20 6 L20 12 M20 28 L20 34" fill="none" stroke="#8C5832" stroke-width="2.5"/></svg></div>
+            <div class="slot-badge"><svg viewBox="0 0 40 40"><path d="M8 24 C14 18 26 18 32 24 M12 28 C16 23 24 23 28 28" fill="none" stroke="#325B64" stroke-width="2.2"/></svg></div>
+            <div class="slot-badge"><svg viewBox="0 0 40 40"><path d="M8 20 Q16 12 25 15 T26 26" fill="none" stroke="#4D6960" stroke-width="2.2"/></svg></div>
+          </div>
+          <div class="god-content">
+            <div class="god-ability"><b>神恩／遗赠</b>将自己的一张供奉及印记移到另一神的匹配空槽；补满时视你为收尾者。</div>
+            <div class="god-lore">“海仍在潮起潮落，人们却忘了岛屿曾从哪里升起。”</div>
+          </div>
+        </div>
+
+        <div class="god-card interactive-god">
+          <div class="god-art"><img src="images/ape_huci_master.jpg" alt="火姥神"></div>
+          <div class="god-meta">
+            <span class="god-culture">阿伊努 · Ape-huci-kamuy</span>
+            <h3 class="god-name">火姥神</h3>
+          </div>
+          <div class="god-slots">
+            <div class="slot-badge"><svg viewBox="0 0 40 40"><path d="M10 20 L20 12 L30 20 L20 28 Z M20 6 L20 12" fill="none" stroke="#8C5832" stroke-width="2.5"/></svg></div>
+            <div class="slot-badge"><svg viewBox="0 0 40 40"><path d="M20 7 C20 7 15 15 15 22 A5 5 0 0 0 25 22 Z" fill="none" stroke="#A24230" stroke-width="2"/></svg></div>
+            <div class="slot-badge"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="5" fill="none" stroke="#9A7736" stroke-width="2"/><path d="M20 5 L20 35 M5 20 L35 20" stroke="#9A7736" stroke-width="1.8"/></svg></div>
+          </div>
+          <div class="god-content">
+            <div class="god-ability"><b>神恩／遗赠</b>自己的心智上限恢复一点，并摸一张牌。</div>
+            <div class="god-lore">“炉火仍然燃烧，人们却忘了为归来者留一个位置。”</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 视图 3: 风暴牌展柜 -->
+    <div id="view-storms" class="view-panel">
+      <div class="section-title">
+        <span>风暴牌系统 · 叙事与机制</span>
+        <small>三季递进：初冬无严寒 → 深冬选择燃烧 → 极夜强制燃烧</small>
+      </div>
+      <div class="cards-row">
+        <div class="storm-card">
+          <div class="storm-art"><img src="images/storm_white_frost_master.jpg" alt="初冬·白霜"></div>
+          <div class="storm-header"><span class="storm-season">初冬 · EARLY WINTER</span><div class="storm-targets"><span class="target-badge">1</span></div></div>
+          <div class="storm-name-block"><h3 class="storm-name">白霜</h3></div>
+          <div class="storm-body"><div class="storm-rule">依次为 <b>1</b> 号神座增加一点风化。<br>无严寒。</div><div class="storm-lore">“远山披上第一道白霜，寒意在荒原上无声弥散。”</div></div>
+        </div>
+        <div class="storm-card">
+          <div class="storm-art"><img src="images/storm_frozen_river_master.jpg" alt="深冬·冻河"></div>
+          <div class="storm-header"><span class="storm-season">深冬 · MID WINTER</span><div class="storm-targets"><span class="target-badge">2</span></div></div>
+          <div class="storm-name-block"><h3 class="storm-name">冻河</h3></div>
+          <div class="storm-body"><div class="storm-rule">依次为 <b>2</b> 号神座增加一点风化。<br><span class="chill-tag">严寒</span> 每位有手牌的玩家选择弃一张，或燃烧一张。</div><div class="storm-lore">“碎冰在河道中死寂，寒气咬碎了最后的流动。”</div></div>
+        </div>
+        <div class="storm-card">
+          <div class="storm-art"><img src="images/storm_black_tide_master.jpg" alt="极夜·黑潮"></div>
+          <div class="storm-header"><span class="storm-season">极夜 · POLAR NIGHT</span><div class="storm-targets"><span class="target-badge">1</span><span class="target-badge">2</span></div></div>
+          <div class="storm-name-block"><h3 class="storm-name">黑潮</h3></div>
+          <div class="storm-body"><div class="storm-rule">首张极夜先结算<b>极夜合诵</b>。依次为 <b>1、2</b> 号神座各增加一点风化。<br><span class="chill-tag">严寒</span> 必须燃烧一张。</div><div class="storm-lore">“天穹塌落如巨浪，黑色冰潮席卷了最后的岸线。”</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 视图 4: 矢量符号与萨满纹章 -->
+    <div id="view-vectors" class="view-panel">
+      <div class="section-title">
+        <span>五大真名语素符号 (SVG)</span>
+        <small>低墨骨架 · 15mm 缩放高辨识度 · 矿物色调和</small>
+      </div>
+      <div class="icon-grid">
+        <!-- 骨 -->
+        <div class="icon-card">
+          <svg viewBox="0 0 50 50">
+            <path d="M12 25 L25 15 L38 25 L25 35 Z M25 7 L25 15 M25 35 L25 43 M17 21 L33 29 M17 29 L33 21" fill="none" stroke="#8C5832" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="25" cy="25" r="2.5" fill="#8C5832"/>
+          </svg>
+          <b>骨 · BONE</b>
+          <em>骨片、年轮、山脊</em>
+          <div class="desc">三节骨刻与中央山脊棱线。用于判定风化增减与安魂基础祭品。</div>
+          <div class="token-preview">
+            <svg viewBox="0 0 50 50"><path d="M12 25 L25 15 L38 25 L25 35 Z M25 7 L25 15 M25 35 L25 43" fill="none" stroke="#8C5832" stroke-width="3"/></svg>
+          </div>
+        </div>
+
+        <!-- 风 -->
+        <div class="icon-card">
+          <svg viewBox="0 0 50 50">
+            <path d="M9 25 C18 13 32 15 34 22 C36 29 28 35 21 32 C15 29 17 21 27 20 C34 19 40 25 41 28" fill="none" stroke="#4D6960" stroke-width="2.8" stroke-linecap="round"/>
+            <path d="M14 31 C19 25 28 25 31 29" fill="none" stroke="#4D6960" stroke-width="1.8" stroke-dasharray="2 3"/>
+          </svg>
+          <b>风 · WIND</b>
+          <em>气流、羽线、回旋</em>
+          <div class="desc">连续流动的回旋涡流与双羽线。用于调整风暴牌堆顶与放置禁忌。</div>
+          <div class="token-preview">
+            <svg viewBox="0 0 50 50"><path d="M9 25 C18 13 32 15 34 22 C36 29 28 35 21 32 C15 29 17 21 27 20" fill="none" stroke="#4D6960" stroke-width="3"/></svg>
+          </div>
+        </div>
+
+        <!-- 潮 -->
+        <div class="icon-card">
+          <svg viewBox="0 0 50 50">
+            <path d="M8 29 C16 20 34 20 42 29 M13 34 C19 27 31 27 37 34 M18 20 C21 14 29 14 32 20" fill="none" stroke="#325B64" stroke-width="2.8" stroke-linecap="round"/>
+            <circle cx="25" cy="11" r="2.5" fill="#325B64"/>
+          </svg>
+          <b>潮 · TIDE</b>
+          <em>潮线、水滴、涟漪</em>
+          <div class="desc">三重渐层古海图浪线与顶端悬水。用于回溯记忆与补充手牌。</div>
+          <div class="token-preview">
+            <svg viewBox="0 0 50 50"><path d="M8 29 C16 20 34 20 42 29 M13 34 C19 27 31 27 37 34" fill="none" stroke="#325B64" stroke-width="3"/></svg>
+          </div>
+        </div>
+
+        <!-- 炎 -->
+        <div class="icon-card">
+          <svg viewBox="0 0 50 50">
+            <path d="M25 8 C25 8 18 18 18 27 A7 7 0 0 0 32 27 C32 21 25 8 25 8 Z M18 29 C14 25 13 20 13 20 C13 20 8 25 8 32 A8 8 0 0 0 21 36 C19 33 18 29 18 29 Z M32 29 C36 25 37 20 37 20 C37 20 42 25 42 32 A8 8 0 0 1 29 36 C31 33 32 29 32 29 Z" fill="none" stroke="#A24230" stroke-width="2.6" stroke-linejoin="round"/>
+            <circle cx="25" cy="27" r="2" fill="#A24230"/>
+          </svg>
+          <b>炎 · FIRE</b>
+          <em>余烬、火舌、裂光</em>
+          <div class="desc">三叉古火塘火种与向上破裂的微光。燃烧时不损耗心智上限。</div>
+          <div class="token-preview">
+            <svg viewBox="0 0 50 50"><path d="M25 8 C25 8 18 18 18 27 A7 7 0 0 0 32 27 Z" fill="none" stroke="#A24230" stroke-width="3"/></svg>
+          </div>
+        </div>
+
+        <!-- 星 -->
+        <div class="icon-card">
+          <svg viewBox="0 0 50 50">
+            <circle cx="25" cy="25" r="7" fill="none" stroke="#9A7736" stroke-width="2.5"/>
+            <path d="M25 5 L25 45 M5 25 L45 25 M11 11 L39 39 M11 39 L39 11" stroke="#9A7736" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="25" cy="25" r="2.5" fill="#9A7736"/>
+          </svg>
+          <b>星 · STAR</b>
+          <em>星路、光点、冠环</em>
+          <div class="desc">四芒长星与同心天体环冠。用于记录萨满传火余音。</div>
+          <div class="token-preview">
+            <svg viewBox="0 0 50 50"><circle cx="25" cy="25" r="7" fill="none" stroke="#9A7736" stroke-width="2.5"/><path d="M25 5 L25 45 M5 25 L45 25" stroke="#9A7736" stroke-width="2"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title">
+        <span>六位萨满个人纹章 (供奉印记与面板徽标)</span>
+        <small>各具神异 · 极简剪影 · 制作成 20mm 印记标记</small>
+      </div>
+      <div class="icon-grid">
+        <!-- 渡门 -->
+        <div class="icon-card">
+          <svg viewBox="0 0 50 50">
+            <path d="M12 10 Q25 25 12 40 M38 10 Q25 25 38 40" fill="none" stroke="#2C261F" stroke-width="2.8" stroke-linecap="round"/>
+            <path d="M20 25 Q25 20 30 25 Q25 30 20 25 Z" fill="#2C261F"/>
+          </svg>
+          <b>渡门</b>
+          <em>渡魂人 · SHAMAN 01</em>
+          <div class="desc">两道对向岸线围住一叶轻舟。守艺：移渡供奉牌。</div>
+          <div class="token-preview">
+            <svg viewBox="0 0 50 50"><path d="M12 10 Q25 25 12 40 M38 10 Q25 25 38 40" fill="none" stroke="#2C261F" stroke-width="3"/><circle cx="25" cy="25" r="2.5" fill="#2C261F"/></svg>
+          </div>
+        </div>
+
+        <!-- 冰裂 -->
+        <div class="icon-card">
+          <svg viewBox="0 0 50 50">
+            <circle cx="25" cy="25" r="16" fill="none" stroke="#2C261F" stroke-width="1.8" stroke-dasharray="3 3"/>
+            <circle cx="25" cy="25" r="9" fill="none" stroke="#2C261F" stroke-width="2"/>
+            <path d="M8 12 L22 23 L26 27 L42 38" fill="none" stroke="#2C261F" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+          <b>冰裂</b>
+          <em>听冬者 · SHAMAN 02</em>
+          <div class="desc">同心冰层被一道锐利折线贯穿。守艺：预见风暴。</div>
+          <div class="token-preview">
+            <svg viewBox="0 0 50 50"><circle cx="25" cy="25" r="12" fill="none" stroke="#2C261F" stroke-width="2"/><path d="M10 12 L24 25 L40 38" stroke="#2C261F" stroke-width="3"/></svg>
+          </div>
+        </div>
+
+        <!-- 骨刻 -->
+        <div class="icon-card">
+          <svg viewBox="0 0 50 50">
+            <path d="M25 8 L32 15 L32 35 L25 42 L18 35 L18 15 Z" fill="none" stroke="#2C261F" stroke-width="2.2"/>
+            <path d="M20 19 L30 23 M20 25 L30 29 M20 31 L30 35" stroke="#2C261F" stroke-width="2.6" stroke-linecap="round"/>
+          </svg>
+          <b>骨刻</b>
+          <em>刻骨者 · SHAMAN 03</em>
+          <div class="desc">骨版上的三道斜切刀痕。守艺：任意手牌充当骨。</div>
+          <div class="token-preview">
+            <svg viewBox="0 0 50 50"><path d="M25 9 L31 16 L31 34 L25 41 L19 34 L19 16 Z" fill="none" stroke="#2C261F" stroke-width="2"/><path d="M21 21 L29 24 M21 27 L29 30" stroke="#2C261F" stroke-width="2.5"/></svg>
+          </div>
+        </div>
+
+        <!-- 捧火 -->
+        <div class="icon-card">
+          <svg viewBox="0 0 50 50">
+            <path d="M10 32 C13 39 25 42 25 42 C25 42 37 39 40 32 M10 32 C12 25 18 24 18 24 M40 32 C38 25 32 24 32 24" fill="none" stroke="#2C261F" stroke-width="2.6" stroke-linecap="round"/>
+            <path d="M25 12 L29 21 L25 27 L21 21 Z" fill="#2C261F"/>
+          </svg>
+          <b>捧火</b>
+          <em>守火人 · SHAMAN 04</em>
+          <div class="desc">环抱手形弧线稳托一枚火星。守艺：燃烧解救濒死之神。</div>
+          <div class="token-preview">
+            <svg viewBox="0 0 50 50"><path d="M12 34 C16 41 25 41 25 41 C25 41 34 41 38 34" fill="none" stroke="#2C261F" stroke-width="2.8"/><circle cx="25" cy="20" r="3" fill="#2C261F"/></svg>
+          </div>
+        </div>
+
+        <!-- 绳结 -->
+        <div class="icon-card">
+          <svg viewBox="0 0 50 50">
+            <path d="M14 14 Q25 25 36 36 M36 14 Q25 25 14 36 M10 25 Q25 12 40 25 Q25 38 10 25" fill="none" stroke="#2C261F" stroke-width="2.4" stroke-linecap="round"/>
+            <circle cx="25" cy="25" r="3" fill="#2C261F"/>
+          </svg>
+          <b>绳结</b>
+          <em>织名者 · SHAMAN 05</em>
+          <div class="desc">多股细绳在中心盘结闭合。守艺：唤醒神获得额外余音。</div>
+          <div class="token-preview">
+            <svg viewBox="0 0 50 50"><path d="M14 14 Q25 25 36 36 M36 14 Q25 25 14 36" stroke="#2C261F" stroke-width="2.8"/><circle cx="25" cy="25" r="4" fill="none" stroke="#2C261F" stroke-width="2"/></svg>
+          </div>
+        </div>
+
+        <!-- 岔路星 -->
+        <div class="icon-card">
+          <svg viewBox="0 0 50 50">
+            <path d="M25 42 L25 24 M25 24 L12 12 M25 24 L38 12" fill="none" stroke="#2C261F" stroke-width="2.8" stroke-linecap="round"/>
+            <path d="M25 8 L27 13 L32 15 L27 17 L25 22 L23 17 L18 15 L23 13 Z" fill="#2C261F"/>
+          </svg>
+          <b>岔路星</b>
+          <em>问途者 · SHAMAN 06</em>
+          <div class="desc">三向分岔路径上方悬一星。守艺：关键回合任意牌代语素。</div>
+          <div class="token-preview">
+            <svg viewBox="0 0 50 50"><path d="M25 40 L25 25 M25 25 L14 14 M25 25 L36 14" stroke="#2C261F" stroke-width="3"/><circle cx="25" cy="11" r="3" fill="#2C261F"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 视图 5: A4 打印排版 -->
+    <div id="view-print" class="view-panel">
+      <!-- 第 1 页：卡牌页 (2张神牌 + 3张风暴牌) -->
+      <div class="print-sheet">
+        <div class="print-header-tip">
+          <span>《真名之火》样张打印 · 第一页：卡牌（佳能 G3812 适配版 · 沿浅细角标十字裁切）</span>
+          <span>A4 纸张 · 100% 无缩放</span>
+        </div>
+
+        <!-- 上排：两张神牌 90x85mm -->
+        <div class="a4-grid-page1">
+          <!-- 毛伊 -->
+          <div class="crop-wrap">
+            <div class="corner-mark corner-tl"></div>
+            <div class="corner-mark corner-tr"></div>
+            <div class="corner-mark corner-bl"></div>
+            <div class="corner-mark corner-br"></div>
+            <div class="god-card">
+              <div class="god-art"><img src="images/maui_master.jpg" alt="毛伊"></div>
+              <div class="god-meta">
+                <span class="god-culture">毛利 · Māui</span>
+                <h3 class="god-name">毛伊</h3>
+              </div>
+              <div class="god-slots">
+                <div class="slot-badge"><svg viewBox="0 0 40 40"><path d="M10 20 L20 12 L30 20 L20 28 Z M20 6 L20 12 M20 28 L20 34" fill="none" stroke="#8C5832" stroke-width="2.5"/></svg></div>
+                <div class="slot-badge"><svg viewBox="0 0 40 40"><path d="M8 24 C14 18 26 18 32 24 M12 28 C16 23 24 23 28 28" fill="none" stroke="#325B64" stroke-width="2.2"/></svg></div>
+                <div class="slot-badge"><svg viewBox="0 0 40 40"><path d="M8 20 Q16 12 25 15 T26 26" fill="none" stroke="#4D6960" stroke-width="2.2"/></svg></div>
+              </div>
+              <div class="god-content">
+                <div class="god-ability"><b>神恩／遗赠</b>将自己的一张供奉及印记移到另一神的匹配空槽；补满时视你为收尾者。</div>
+                <div class="god-lore">“海仍在潮起潮落，人们却忘了岛屿曾从哪里升起。”</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 火姥神 -->
+          <div class="crop-wrap">
+            <div class="corner-mark corner-tl"></div>
+            <div class="corner-mark corner-tr"></div>
+            <div class="corner-mark corner-bl"></div>
+            <div class="corner-mark corner-br"></div>
+            <div class="god-card">
+              <div class="god-art"><img src="images/ape_huci_master.jpg" alt="火姥神"></div>
+              <div class="god-meta">
+                <span class="god-culture">阿伊努 · Ape-huci-kamuy</span>
+                <h3 class="god-name">火姥神</h3>
+              </div>
+              <div class="god-slots">
+                <div class="slot-badge"><svg viewBox="0 0 40 40"><path d="M10 20 L20 12 L30 20 L20 28 Z M20 6 L20 12" fill="none" stroke="#8C5832" stroke-width="2.5"/></svg></div>
+                <div class="slot-badge"><svg viewBox="0 0 40 40"><path d="M20 7 C20 7 15 15 15 22 A5 5 0 0 0 25 22 Z" fill="none" stroke="#A24230" stroke-width="2"/></svg></div>
+                <div class="slot-badge"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="5" fill="none" stroke="#9A7736" stroke-width="2"/><path d="M20 5 L20 35 M5 20 L35 20" stroke="#9A7736" stroke-width="1.8"/></svg></div>
+              </div>
+              <div class="god-content">
+                <div class="god-ability"><b>神恩／遗赠</b>自己的心智上限恢复一点，并摸一张牌。</div>
+                <div class="god-lore">“炉火仍然燃烧，人们却忘了为归来者留一个位置。”</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 下排：三张风暴牌 63x88mm -->
+        <div class="a4-grid-storms">
+          <!-- 初冬 -->
+          <div class="crop-wrap">
+            <div class="corner-mark corner-tl"></div>
+            <div class="corner-mark corner-tr"></div>
+            <div class="corner-mark corner-bl"></div>
+            <div class="corner-mark corner-br"></div>
+            <div class="storm-card">
+              <div class="storm-art"><img src="images/storm_white_frost_master.jpg" alt="初冬·白霜"></div>
+              <div class="storm-header"><span class="storm-season">初冬</span><div class="storm-targets"><span class="target-badge">1</span></div></div>
+              <div class="storm-name-block"><h3 class="storm-name">白霜</h3></div>
+              <div class="storm-body"><div class="storm-rule">依次为 <b>1</b> 号神座增加一点风化。<br>无严寒。</div><div class="storm-lore">“远山披上第一道白霜，寒意在荒原上无声弥散。”</div></div>
+            </div>
+          </div>
+
+          <!-- 深冬 -->
+          <div class="crop-wrap">
+            <div class="corner-mark corner-tl"></div>
+            <div class="corner-mark corner-tr"></div>
+            <div class="corner-mark corner-bl"></div>
+            <div class="corner-mark corner-br"></div>
+            <div class="storm-card">
+              <div class="storm-art"><img src="images/storm_frozen_river_master.jpg" alt="深冬·冻河"></div>
+              <div class="storm-header"><span class="storm-season">深冬</span><div class="storm-targets"><span class="target-badge">2</span></div></div>
+              <div class="storm-name-block"><h3 class="storm-name">冻河</h3></div>
+              <div class="storm-body"><div class="storm-rule">依次为 <b>2</b> 号神座增加一点风化。<br><span class="chill-tag">严寒</span> 弃一张或燃烧一张。</div><div class="storm-lore">“碎冰在河道中死寂，寒气咬碎了最后的流动。”</div></div>
+            </div>
+          </div>
+
+          <!-- 极夜 -->
+          <div class="crop-wrap">
+            <div class="corner-mark corner-tl"></div>
+            <div class="corner-mark corner-tr"></div>
+            <div class="corner-mark corner-bl"></div>
+            <div class="corner-mark corner-br"></div>
+            <div class="storm-card">
+              <div class="storm-art"><img src="images/storm_black_tide_master.jpg" alt="极夜·黑潮"></div>
+              <div class="storm-header"><span class="storm-season">极夜</span><div class="storm-targets"><span class="target-badge">1</span><span class="target-badge">2</span></div></div>
+              <div class="storm-name-block"><h3 class="storm-name">黑潮</h3></div>
+              <div class="storm-body"><div class="storm-rule">首张先合诵。为 <b>1、2</b> 号神座各增一点风化。<br><span class="chill-tag">严寒</span> 必须燃烧一张。</div><div class="storm-lore">“天穹塌落如巨浪，黑色冰潮席卷了最后的岸线。”</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 第 2 页：印记与语素标记页 -->
+      <div class="print-sheet">
+        <div class="print-header-tip">
+          <span>《真名之火》样张打印 · 第二页：萨满供奉印记与语素标记（各印记配4枚，直径约22mm）</span>
+          <span>剪下可直接贴于20-25mm圆木片或厚卡纸上</span>
+        </div>
+
+        <div style="font-size: 13px; font-weight: bold; margin: 4mm 0 2mm 8mm; letter-spacing: 1px;">六位萨满供奉印记（每位4枚，共24枚）：</div>
+        <div class="tokens-print-grid">
+          <div class="print-token-unit"><svg viewBox="0 0 50 50"><path d="M12 10 Q25 25 12 40 M38 10 Q25 25 38 40" fill="none" stroke="#2C261F" stroke-width="3"/><path d="M20 25 Q25 20 30 25 Q25 30 20 25 Z" fill="#2C261F"/></svg><span>渡门 1</span></div>
+          <div class="print-token-unit"><svg viewBox="0 0 50 50"><path d="M12 10 Q25 25 12 40 M38 10 Q25 25 38 40" fill="none" stroke="#2C261F" stroke-width="3"/><path d="M20 25 Q25 20 30 25 Q25 30 20 25 Z" fill="#2C261F"/></svg><span>渡门 2</span></div>
+          <div class="print-token-unit"><svg viewBox="0 0 50 50"><path d="M12 10 Q25 25 12 40 M38 10 Q25 25 38 40" fill="none" stroke="#2C261F" stroke-width="3"/><path d="M20 25 Q25 20 30 25 Q25 30 20 25 Z" fill="#2C261F"/></svg><span>渡门 3</span></div>
+          <div class="print-token-unit"><svg viewBox="0 0 50 50"><path d="M12 10 Q25 25 12 40 M38 10 Q25 25 38 40" fill="none" stroke="#2C261F" stroke-width="3"/><path d="M20 25 Q25 20 30 25 Q25 30 20 25 Z" fill="#2C261F"/></svg><span>渡门 4</span></div>
+          
+          <div class="print-token-unit"><svg viewBox="0 0 50 50"><circle cx="25" cy="25" r="14" fill="none" stroke="#2C261F" stroke-width="1.8" stroke-dasharray="3 2"/><path d="M8 12 L22 23 L26 27 L42 38" stroke="#2C261F" stroke-width="3"/></svg><span>冰裂 1</span></div>
+          <div class="print-token-unit"><svg viewBox="0 0 50 50"><circle cx="25" cy="25" r="14" fill="none" stroke="#2C261F" stroke-width="1.8" stroke-dasharray="3 2"/><path d="M8 12 L22 23 L26 27 L42 38" stroke="#2C261F" stroke-width="3"/></svg><span>冰裂 2</span></div>
+
+          <div class="print-token-unit"><svg viewBox="0 0 50 50"><circle cx="25" cy="25" r="14" fill="none" stroke="#2C261F" stroke-width="1.8" stroke-dasharray="3 2"/><path d="M8 12 L22 23 L26 27 L42 38" stroke="#2C261F" stroke-width="3"/></svg><span>冰裂 3</span></div>
+          <div class="print-token-unit"><svg viewBox="0 0 50 50"><circle cx="25" cy="25" r="14" fill="none" stroke="#2C261F" stroke-width="1.8" stroke-dasharray="3 2"/><path d="M8 12 L22 23 L26 27 L42 38" stroke="#2C261F" stroke-width="3"/></svg><span>冰裂 4</span></div>
+          <div class="print-token-unit"><svg viewBox="0 0 50 50"><path d="M25 9 L31 16 L31 34 L25 41 L19 34 L19 16 Z" fill="none" stroke="#2C261F" stroke-width="2"/><path d="M20 20 L30 24 M20 26 L30 30 M20 32 L30 36" stroke="#2C261F" stroke-width="2.5"/></svg><span>骨刻 1</span></div>
+          <div class="print-token-unit"><svg viewBox="0 0 50 50"><path d="M25 9 L31 16 L31 34 L25 41 L19 34 L19 16 Z" fill="none" stroke="#2C261F" stroke-width="2"/><path d="M20 20 L30 24 M20 26 L30 30 M20 32 L30 36" stroke="#2C261F" stroke-width="2.5"/></svg><span>骨刻 2</span></div>
+          <div class="print-token-unit"><svg viewBox="0 0 50 50"><path d="M25 9 L31 16 L31 34 L25 41 L19 34 L19 16 Z" fill="none" stroke="#2C261F" stroke-width="2"/><path d="M20 20 L30 24 M20 26 L30 30 M20 32 L30 36" stroke="#2C261F" stroke-width="2.5"/></svg><span>骨刻 3</span></div>
+          <div class="print-token-unit"><svg viewBox="0 0 50 50"><path d="M25 9 L31 16 L31 34 L25 41 L19 34 L19 16 Z" fill="none" stroke="#2C261F" stroke-width="2"/><path d="M20 20 L30 24 M20 26 L30 30 M20 32 L30 36" stroke="#2C261F" stroke-width="2.5"/></svg><span>骨刻 4</span></div>
+
+          <div class="print-token-unit"><svg viewBox="0 0 50 50"><path d="M12 34 C16 41 25 41 25 41 C25 41 34 41 38 34" fill="none" stroke="#2C261F" stroke-width="2.8"/><path d="M25 12 L29 21 L25 27 L21 21 Z" fill="#2C261F"/></svg><span>捧火 1</span></div>
+          <div class="print-token-unit"><svg viewBox="0 0 50 50"><path d="M12 34 C16 41 25 41 25 41 C25 41 34 41 38 34" fill="none" stroke="#2C261F" stroke-width="2.8"/><path d="M25 12 L29 21 L25 27 L21 21 Z" fill="#2C261F"/></svg><span>捧火 2</span></div>
+          <div class="print-token-unit"><svg viewBox="0 0 50 50"><path d="M12 34 C16 41 25 41 25 41 C25 41 34 41 38 34" fill="none" stroke="#2C261F" stroke-width="2.8"/><path d="M25 12 L29 21 L25 27 L21 21 Z" fill="#2C261F"/></svg><span>捧火 3</span></div>
+          <div class="print-token-unit"><svg viewBox="0 0 50 50"><path d="M12 34 C16 41 25 41 25 41 C25 41 34 41 38 34" fill="none" stroke="#2C261F" stroke-width="2.8"/><path d="M25 12 L29 21 L25 27 L21 21 Z" fill="#2C261F"/></svg><span>捧火 4</span></div>
+          <div class="print-token-unit"><svg viewBox="0 0 50 50"><path d="M14 14 Q25 25 36 36 M36 14 Q25 25 14 36" stroke="#2C261F" stroke-width="2.6"/><circle cx="25" cy="25" r="3" fill="#2C261F"/></svg><span>绳结 1</span></div>
+          <div class="print-token-unit"><svg viewBox="0 0 50 50"><path d="M14 14 Q25 25 36 36 M36 14 Q25 25 14 36" stroke="#2C261F" stroke-width="2.6"/><circle cx="25" cy="25" r="3" fill="#2C261F"/></svg><span>绳结 2</span></div>
+
+          <div class="print-token-unit"><svg viewBox="0 0 50 50"><path d="M14 14 Q25 25 36 36 M36 14 Q25 25 14 36" stroke="#2C261F" stroke-width="2.6"/><circle cx="25" cy="25" r="3" fill="#2C261F"/></svg><span>绳结 3</span></div>
+          <div class="print-token-unit"><svg viewBox="0 0 50 50"><path d="M14 14 Q25 25 36 36 M36 14 Q25 25 14 36" stroke="#2C261F" stroke-width="2.6"/><circle cx="25" cy="25" r="3" fill="#2C261F"/></svg><span>绳结 4</span></div>
+          <div class="print-token-unit"><svg viewBox="0 0 50 50"><path d="M25 42 L25 24 M25 24 L12 12 M25 24 L38 12" stroke="#2C261F" stroke-width="2.8"/><circle cx="25" cy="11" r="3" fill="#2C261F"/></svg><span>岔路 1</span></div>
+          <div class="print-token-unit"><svg viewBox="0 0 50 50"><path d="M25 42 L25 24 M25 24 L12 12 M25 24 L38 12" stroke="#2C261F" stroke-width="2.8"/><circle cx="25" cy="11" r="3" fill="#2C261F"/></svg><span>岔路 2</span></div>
+          <div class="print-token-unit"><svg viewBox="0 0 50 50"><path d="M25 42 L25 24 M25 24 L12 12 M25 24 L38 12" stroke="#2C261F" stroke-width="2.8"/><circle cx="25" cy="11" r="3" fill="#2C261F"/></svg><span>岔路 3</span></div>
+          <div class="print-token-unit"><svg viewBox="0 0 50 50"><path d="M25 42 L25 24 M25 24 L12 12 M25 24 L38 12" stroke="#2C261F" stroke-width="2.8"/><circle cx="25" cy="11" r="3" fill="#2C261F"/></svg><span>岔路 4</span></div>
+        </div>
+
+        <div style="font-size: 13px; font-weight: bold; margin: 8mm 0 2mm 8mm; letter-spacing: 1px;">五真名语素指示物与神恩备用标记：</div>
+        <div class="tokens-print-grid" style="margin-top: 2mm;">
+          <div class="print-token-unit"><svg viewBox="0 0 40 40"><path d="M10 20 L20 12 L30 20 L20 28 Z M20 6 L20 12" fill="none" stroke="#8C5832" stroke-width="2.5"/></svg><span>骨</span></div>
+          <div class="print-token-unit"><svg viewBox="0 0 40 40"><path d="M8 20 Q16 12 25 15 T26 26" fill="none" stroke="#4D6960" stroke-width="2.4"/></svg><span>风</span></div>
+          <div class="print-token-unit"><svg viewBox="0 0 40 40"><path d="M8 24 C14 18 26 18 32 24 M12 28 C16 23 24 23 28 28" fill="none" stroke="#325B64" stroke-width="2.4"/></svg><span>潮</span></div>
+          <div class="print-token-unit"><svg viewBox="0 0 40 40"><path d="M20 7 C20 7 15 15 15 22 A5 5 0 0 0 25 22 Z" fill="none" stroke="#A24230" stroke-width="2.2"/></svg><span>炎</span></div>
+          <div class="print-token-unit"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="5" fill="none" stroke="#9A7736" stroke-width="2.2"/><path d="M20 5 L20 35 M5 20 L35 20" stroke="#9A7736" stroke-width="1.8"/></svg><span>星</span></div>
+          <div class="print-token-unit"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="10" fill="none" stroke="#8C3524" stroke-width="2" stroke-dasharray="2 2"/><text x="20" y="24" font-size="12" text-anchor="middle" fill="#8C3524" font-weight="bold">禁</text></svg><span>禁忌</span></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active'));
+      
+      const targetPanel = document.getElementById('view-' + tabId);
+      if (targetPanel) {
+        targetPanel.classList.add('active');
+      }
+      
+      const buttons = document.querySelectorAll('.tab-btn');
+      const map = { 'overview': 0, 'gods': 1, 'storms': 2, 'vectors': 3, 'print': 4 };
+      if (buttons[map[tabId]]) {
+        buttons[map[tabId]].classList.add('active');
+      }
+    }
+
+    function toggleDying() {
+      document.querySelectorAll('.interactive-god').forEach(card => {
+        card.classList.toggle('dying');
+      });
+    }
+  </script>
+</body>
+</html>
