@@ -7,6 +7,7 @@ for (const name of [
   'game/engine',
   'game/ai',
   'game/feedback',
+  'game/presentation',
   'rooms',
 ]) {
   const source = await readFile(`lib/${name}.ts`, 'utf8');

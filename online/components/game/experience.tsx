@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { actionMemories } from '@/lib/game/presentation';
 import { RULES } from '@/lib/game/config';
 import { GODS } from '@/lib/game/content';
 import type { GameView, PublicAction } from '@/lib/game/engine';
@@ -12,12 +13,12 @@ export function ScoreGuide({ g, self }: { g: GameView; self: number }) {
   return (
     <section className="score-guide panel">
       <div>
-        <span className="eyebrow">你的当前计分</span>
+        <span className="eyebrow">你留住的火</span>
         <strong>
           {g.failed ? '—' : p.score.total}
           <small>分</small>
         </strong>
-        <p>四座全毁则共同失败，分数作废。</p>
+        <p>天亮时，谁将成为传火者？</p>
       </div>
       <div className="score-parts">
         <div>
@@ -46,7 +47,7 @@ export function ScoreGuide({ g, self }: { g: GameView; self: number }) {
         </div>
       </div>
       <details>
-        <summary>为什么补神？怎样算赢？</summary>
+        <summary>守夜的约定 · 计分与神座</summary>
         <p>
           四座神座是同时等待处理的神，不是整局只有四尊。唤醒或安魂后，空位在该玩家回合整理结束时，从有限的后备堆补一尊；湮灭的神座成为废墟，永久关闭。后备用尽就不再补。当前后备还剩{' '}
           {g.godCount} 尊。
@@ -73,11 +74,14 @@ export function ActionPreview({
 }) {
   const p = g.players[self],
     s = action.target === undefined ? undefined : g.seats[action.target];
-  let text = '确认后按所选效果结算；需要指定目标或选牌时，还会继续让你选择。';
+  let text = '';
+  let title = action.group;
+  const elements = actionMemories(g, self, action).map((c) => c.element);
+  const names = elements.map((e) => `「${e}」`).join('、');
   if (action.group === '供奉' && s) {
     const own = s.offerings.filter((o) => o.player === self).length;
     if (s.offerings.length < 2)
-      text = `现在不加分。真名进度 ${s.offerings.length}/3 → ${s.offerings.length + 1}/3，你在这尊神上的印记 ${own} → ${own + 1}。`;
+      text = `真名渐渐清晰：${s.offerings.length + 1}/3。你留下的印记：${own + 1}枚。`;
     else {
       const owners = g.players.map(
         (_, i) =>
@@ -87,50 +91,47 @@ export function ActionPreview({
       const winner = owners.findIndex((n) => n >= 2);
       text =
         winner === self
-          ? '补满后你获得这尊神：＋5分，并获得神恩。空位要到整理结束才补神。'
+          ? '真名完整了。这尊神将回应你的呼唤。＋5分 · 获得神恩'
           : winner >= 0
-            ? `补满后${g.players[winner].name}得神（＋5分），你得${p.shaman === 4 ? 2 : 1}余音。`
-            : `三人各一枚，众声觉醒：你得${p.shaman === 4 ? 2 : 1}余音，神不归任何人。`;
+            ? `神将回应${g.players[winner].name}（＋5分）。你的声音也被记住：＋${p.shaman === 4 ? 2 : 1}余音。`
+            : `三道声音合为真名。神将留在众人之间，你获得${p.shaman === 4 ? 2 : 1}余音。`;
     }
   } else if (action.group === '安魂') {
     const threshold = RULES.setups[g.players.length as 3 | 4 | 5 | 6].vigil;
-    text = `安魂神＋3分${p.rested.length + 1 === threshold ? '，同时达成守夜奖励＋2分' : ''}；心智恢复1（最高5），摸1张。神上的供奉退回各自主人，空位在整理后补神。`;
+    text = `送这尊神安然入夜。＋3分${p.rested.length + 1 === threshold ? ' · 守夜＋2分' : ''} · 心智＋1（至多5）· 摸1张。供奉回到各自主人手中。`;
   } else if (action.group === '遗赠')
-    text =
-      '消耗这份遗赠，神的价值由3分降为2分（−1分），仍计入安魂数量。具体效果随后结算。';
+    text = '借用神最后的馈赠。遗赠使用后，计分由3降为2。';
   else if (action.group === '燃忆') {
     const c = p.hand.find((c) => c.id === action.cards?.[0]);
-    text = `燃烧${c?.element ?? '选定'}牌，${c?.element === '炎' ? '心智不降' : '心智上限−1（最低2）'}，发动巫术，再摸1张；${c?.element === '星' ? '星会直接＋1余音。' : '是否获分取决于后续效果。'}`;
-  } else if (action.group === '寻忆' && action.cards?.length)
-    text = '留下所选记忆，不直接加分；本次具体留牌数量以当前提示为准。';
-  else if (action.group === '寻忆')
-    text =
-      '补充手牌，不直接加分。摸至多3张，选择至多2张留下；回合结束才弃到心智上限。';
+    text = `燃烧${c?.element ?? '选定'}牌，${c?.element === '炎' ? '心智不降' : '心智上限−1（最低2）'}，发动巫术，再摸1张；${c?.element === '星' ? '星留下＋1余音。' : ''}`;
+  } else if (action.group === '寻忆' && g.pool !== undefined) {
+    title = '把它们带回火边';
+    text = names
+      ? `${names}将留在你手中，其余记忆归于灰烬。`
+      : '灰烬中已没有可以带走的记忆。';
+  } else if (action.group === '寻忆')
+    text = '从灰烬中寻找至多三段记忆，留下其中至多两段。';
   else if (action.label.includes('结束回合'))
-    text = `结束整理，空神座依次补入后备神（剩${g.godCount}尊）；废墟不补。然后轮到下一位，或结算轮末。`;
+    text = g.godCount
+      ? '把这一刻交给下一位守夜人。空下的神座，将有新的名字到来。'
+      : '把这一刻交给下一位守夜人。远处已没有等待的神。';
   else if (action.label.includes('跳过辅助'))
-    text = '不花牌、不改分数，直接进入主行动。辅助是可选步骤。';
+    text = '让记忆留在手中，准备供奉、安魂或寻忆。';
   if (action.group === '祈神' || action.group === '遗赠') {
     const god = GODS.find((god) => action.label.includes(god.name));
     if (god)
-      text = `${action.group === '祈神' ? '弃1张牌，不直接改分数。' : '使用后这尊神由3分降为2分（−1分）。'}${god.effect}`;
+      text = `${action.group === '祈神' ? '献出1张记忆，唤起神恩。' : '借用最后的馈赠（−1分）。'}${god.effect}`;
   }
   if (action.group === '整理' && action.cards?.length)
-    text = '弃置这张记忆，不直接扣分。弃至心智上限后，再结束回合并补神。';
+    text = `将${names || '这段记忆'}还给灰烬。手中还能容纳${p.mind}张记忆。`;
   if (action.group === '极夜合诵')
     text =
-      '秘密锁定选择，所有人决定后一起揭晓。覆盖目标神的三种语素可抵消一点风化；这一步不直接计分。';
+      '将声音藏在掌心，等众人一起开口。凑齐神的三种语素，便能抵挡一点风化。';
+  if (!text) return null;
   return (
     <div className="action-impact">
-      <b>这一步会发生什么</b>
-      {action.cards?.length ? (
-        <small>
-          选定手牌：
-          {action.cards
-            .map((id) => p.hand.find((c) => c.id === id)?.element ?? '待选记忆')
-            .join('、')}
-        </small>
-      ) : null}
+      <b>{title}</b>
+      {names && action.group !== '寻忆' && <small>{names}</small>}
       <p>{text}</p>
     </div>
   );

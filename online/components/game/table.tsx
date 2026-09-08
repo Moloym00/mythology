@@ -23,16 +23,11 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from '@/components/ui/select';
+
 import { GODS, SHAMANS, STORMS } from '@/lib/game/content';
 import { ELEMENTS, type Element } from '@/lib/game/engine';
 import { ScoreGuide, ActionPreview, Atmosphere } from './experience';
+import { actionMemories, choiceKey } from '@/lib/game/presentation';
 import { describeChanges } from '@/lib/game/feedback';
 import type { RoomView } from '@/lib/rooms';
 
@@ -254,7 +249,10 @@ export default function Table() {
     ) ?? [];
   // 相同印刷语素的实体卡对选择等价，界面合并重复文案；服务端仍保留唯一卡号。
   const uniqueActions = visibleActions.filter(
-    (a, i, arr) => arr.findIndex((b) => b.label === a.label) === i,
+    (a, i, arr) =>
+      g &&
+      arr.findIndex((b) => choiceKey(g, self, b) === choiceKey(g, self, a)) ===
+        i,
   );
   const chosen = uniqueActions.find((a) => a.id === choice);
   return (
@@ -589,14 +587,17 @@ export default function Table() {
             <section className="table-main">
               <div className="seat-heading">
                 <h2>四座神座</h2>
-                <span className="muted">点击神座筛选行动 · 详情查看神恩</span>
+                <span className="muted">触碰神座 · 聆听神名</span>
               </div>
-              <p className="refill-guide">
-                唤醒 / 安魂 → 完成整理 → 后备补入。废墟永久关闭。
-                {g.godCount === 0
-                  ? '后备已空，不会再补神。'
-                  : `后备还剩 ${g.godCount} 尊，并非无限刷新。`}
-              </p>
+              <details className="refill-guide">
+                <summary>远处还有 {g.godCount} 尊神，等待被记起</summary>
+                <p>
+                  唤醒 / 安魂 → 完成整理 → 后备补入。废墟永久关闭。
+                  {g.godCount === 0
+                    ? '后备已空，不会再补神。'
+                    : `后备还剩 ${g.godCount} 尊，并非无限刷新。`}
+                </p>
+              </details>
               <div className="god-grid">
                 {g.seats.map((s, i) => {
                   const god = s.god !== null ? GODS[s.god] : null;
@@ -724,7 +725,7 @@ export default function Table() {
                     )}
                   </div>
                   <p className="muted hand-tip">
-                    点一张手牌，查看与它有关的行动。燃烧非炎牌使心智上限减一。
+                    每段记忆都可以献给神，也可以投入火中。唯有炎，燃烧时不损心智。
                   </p>
                   <div className="collection">
                     <span>你的神明</span>
@@ -755,7 +756,7 @@ export default function Table() {
             </section>
             <aside className="table-aside">
               <section className="panel decision-feedback">
-                <span className="eyebrow">火塘回响 · 最近的变化</span>
+                <span className="eyebrow">火塘回响</span>
                 <output
                   aria-live="polite"
                   aria-atomic="true"
@@ -765,12 +766,12 @@ export default function Table() {
                   {feedback[0] ? (
                     feedback[0].lines.map((line, i) => <p key={i}>{line}</p>)
                   ) : (
-                    <p>先选行动查看结果预告；结算后的得失会留在这里。</p>
+                    <p>火在等你。今夜，你会留住谁的名字？</p>
                   )}
                 </output>
                 {feedback.length > 1 && (
                   <details>
-                    <summary>回看之前的变化（{feedback.length - 1}步）</summary>
+                    <summary>此前的回响</summary>
                     {feedback.slice(1).map((item) => (
                       <div className="feedback-history" key={item.id}>
                         {item.lines.map((line, i) => (
@@ -785,9 +786,9 @@ export default function Table() {
                 <span className="eyebrow">
                   {g.phase === 'turn'
                     ? {
-                        aux: '① 辅助行动',
-                        main: '② 主行动',
-                        cleanup: '③ 整理回合',
+                        aux: '火光初起 · 辅助',
+                        main: '说出真名 · 主行动',
+                        cleanup: '收拢余烬 · 整理',
                       }[g.step]
                     : g.phase === 'cold'
                       ? '严寒结算'
@@ -834,7 +835,10 @@ export default function Table() {
                 )}
                 {g.actions.length > 0 && (
                   <>
-                    <div className="action-groups">
+                    <div
+                      className="action-groups"
+                      hidden={new Set(g.actions.map((a) => a.group)).size < 2}
+                    >
                       {['全部', ...new Set(g.actions.map((a) => a.group))].map(
                         (v) => (
                           <Button
@@ -860,34 +864,53 @@ export default function Table() {
                         }}
                       >
                         <RotateCcw />
-                        清除筛选
+                        看看其他可能
                       </Button>
                     )}
                     {uniqueActions.length ? (
                       <>
-                        <label id="action-label">
-                          选择行动（{uniqueActions.length}项）
-                        </label>
-                        <Select
-                          value={choice}
-                          onValueChange={(v) => setChoice(v)}
+                        <div
+                          className={`ritual-choices ${g.pool !== undefined ? 'memory-choices' : ''}`}
+                          aria-label={
+                            g.pool !== undefined ? '拾起记忆' : '选择仪式'
+                          }
                         >
-                          <SelectTrigger
-                            className="action-select"
-                            aria-labelledby="action-label"
-                          >
-                            <SelectValue placeholder="点这里选择具体行动">
-                              {chosen?.label}
-                            </SelectValue>
-                          </SelectTrigger>
-                          <SelectContent className="action-menu">
-                            {uniqueActions.map((a) => (
-                              <SelectItem key={a.id} value={a.id}>
-                                {a.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                          {uniqueActions.map((a) => {
+                            const cards = actionMemories(g, self, a);
+                            return (
+                              <button
+                                type="button"
+                                key={a.id}
+                                className={`ritual-choice ${choice === a.id ? 'selected' : ''}`}
+                                aria-pressed={choice === a.id}
+                                onClick={() => setChoice(a.id)}
+                              >
+                                {g.pool !== undefined && cards.length > 0 ? (
+                                  <>
+                                    <span className="memory-pair">
+                                      {cards.map((c, i) => (
+                                        <span
+                                          className={`element e-${ELEMENTS.indexOf(c.element)}`}
+                                          key={i}
+                                        >
+                                          {c.element}
+                                        </span>
+                                      ))}
+                                    </span>
+                                    <span>
+                                      留下
+                                      {cards
+                                        .map((c) => `「${c.element}」`)
+                                        .join('与')}
+                                    </span>
+                                  </>
+                                ) : (
+                                  a.label
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
                         {chosen && (
                           <ActionPreview g={g} self={self} action={chosen} />
                         )}
@@ -898,13 +921,29 @@ export default function Table() {
                             chosen && send('act', { action: chosen.id })
                           }
                         >
-                          {busy ? '正在结算…' : '确认行动'}
+                          {busy
+                            ? '火光回应着…'
+                            : g.pool !== undefined
+                              ? '留住这些记忆'
+                              : chosen?.group === '供奉'
+                                ? '献上记忆'
+                                : chosen?.group === '安魂'
+                                  ? '送神入夜'
+                                  : chosen?.group === '燃忆'
+                                    ? '投入火中'
+                                    : chosen?.group === '祈神'
+                                      ? '呼唤神名'
+                                      : chosen?.group === '寻忆'
+                                        ? '拾起灰烬中的记忆'
+                                        : chosen?.label.includes('结束回合')
+                                          ? '交棒守夜'
+                                          : '继续仪式'}
                           <ArrowRight />
                         </Button>
                       </>
                     ) : (
                       <p className="muted">
-                        没有符合筛选的行动，清除筛选后查看其他选择。
+                        没有符合筛选的行动，看看其他可能后查看其他选择。
                       </p>
                     )}
                   </>
