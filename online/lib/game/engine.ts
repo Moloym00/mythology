@@ -170,7 +170,13 @@ function awake(g: Game, seat: number) {
 }
 function refill(g: Game) {
   for (const s of g.seats)
-    if (s.god === null && !s.ruins && g.gods.length) s.god = g.gods.shift()!;
+    if (s.god === null && !s.ruins && g.gods.length) {
+      s.god = g.gods.shift()!;
+      log(
+        g,
+        `整理结束，${g.seats.indexOf(s) + 1}号神座迎来${GODS[s.god].name}，后备剩${g.gods.length}尊。`,
+      );
+    }
   checkEnd(g);
 }
 function startTurns(g: Game) {

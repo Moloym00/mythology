@@ -56,7 +56,49 @@ export function rankActions(v: GameView, player: number): PublicAction[] {
             : 8;
     if (a.group === '遗赠')
       return p.hand.length < 3 || v.seats.some((t) => t.weather === 2) ? 9 : -3;
-    if (a.group === '祈神') return -5;
+    if (a.group === '祈神') {
+      const god = GODS.find((god) => a.label.includes(god.name));
+      const card = p.hand.find((c) => c.id === a.cards?.[0]);
+      // 保留主行动资源；只为当前公开局面中有收益的神恩付费。
+      if (!god || p.hand.length < 2) return -5;
+      let value = -5;
+      if (
+        god.id === 0 &&
+        v.seats.some((t) => t.offerings.some((o) => o.player === player))
+      )
+        value = 17;
+      if (
+        god.id === 1 &&
+        p.hand.length >= 3 &&
+        v.seats.some((t) => t.god !== null && t.weather === 1)
+      )
+        value = 18;
+      if (
+        god.id === 2 &&
+        v.seats.some((t) => t.god !== null && t.weather === 2)
+      )
+        value = 22;
+      if (god.id === 4 && p.mind < 5) value = 24;
+      if (god.id === 5 && v.seats.some((t) => t.taboo)) value = 20;
+      if (god.id === 7 && p.hand.length >= 3 && v.seats.some((t) => t.taboo))
+        value = 18;
+      if (
+        god.id === 8 &&
+        new Set(
+          v.discard.filter((c) => c.id !== card?.id).map((c) => c.element),
+        ).size >= 2 &&
+        p.hand.length < p.mind
+      )
+        value = 23;
+      if (
+        god.id === 9 &&
+        v.seats.some((t) => t.god !== null && t.weather === 1)
+      )
+        value = 18;
+      if (god.id === 10 && p.mind < 5 && p.hand.length >= 3) value = 18;
+      if (god.id === 11 && p.hand.length < p.mind) value = 16;
+      return value - (card?.element === '骨' ? 4 : 0);
+    }
     if (a.group === '守艺')
       return a.label.includes('移至')
         ? 12

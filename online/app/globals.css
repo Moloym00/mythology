@@ -994,3 +994,140 @@ footer {
   text-align: left;
   color: var(--muted-foreground);
 }
+
+/* 火塘体验：收益、回响和新神入场。 */
+.score-guide {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  gap: 14px 24px;
+  margin: 18px 0;
+  border-color: #c893514d;
+  background: linear-gradient(115deg, #39291f99, #101b29e6);
+}
+.score-guide strong {
+  display: block;
+  font-size: 2.6rem;
+  color: #f3c788;
+  font-variant-numeric: tabular-nums;
+}
+.score-guide strong small {
+  font-size: 0.85rem;
+  margin-left: 8px;
+}
+.score-guide p,
+.score-guide details {
+  font-size: 0.85rem;
+  line-height: 1.8;
+}
+.score-guide details {
+  grid-column: 1 / -1;
+  border-top: 1px solid #c8935133;
+  padding-top: 10px;
+}
+.score-parts {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  align-items: center;
+}
+.score-parts b {
+  display: block;
+  color: #f0d9b8;
+  font-size: 1.5rem;
+}
+.score-parts span {
+  font-size: 0.8rem;
+  color: #bfc8d1;
+}
+.refill-guide {
+  font-size: 0.82rem;
+  color: #c8b697;
+  line-height: 1.7;
+  margin: 0 0 14px;
+}
+.decision-feedback {
+  margin-bottom: 16px;
+  border-color: #bc8f5755;
+}
+.feedback-current p {
+  line-height: 1.7;
+  font-size: 0.88rem;
+  margin: 8px 0;
+  color: #f0d9b8;
+}
+.decision-feedback summary,
+.score-guide summary {
+  cursor: pointer;
+  color: #d6b07c;
+}
+.decision-feedback details {
+  font-size: 0.8rem;
+  max-height: 240px;
+  overflow: auto;
+}
+.feedback-history {
+  border-top: 1px solid #ffffff18;
+  padding: 8px 0;
+  color: #aab6c3;
+}
+.action-impact {
+  border-left: 3px solid #d8a15c;
+  padding: 14px;
+  margin: 14px 0;
+  background: #d8a15c12;
+  font-size: 0.88rem;
+  line-height: 1.8;
+}
+.action-impact b,
+.action-impact small {
+  display: block;
+}
+.action-impact small {
+  color: #d4b894;
+}
+.god-card {
+  animation: god-arrives 0.65s ease-out;
+}
+.feedback-current {
+  animation: echo-arrives 0.4s ease-out;
+}
+@keyframes god-arrives {
+  from {
+    opacity: 0.3;
+    transform: translateY(12px);
+    filter: brightness(1.7);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+@keyframes echo-arrives {
+  from {
+    opacity: 0.3;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (max-width: 700px) {
+  .score-guide {
+    grid-template-columns: 1fr;
+  }
+  .score-parts {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .god-card,
+  .feedback-current {
+    animation: none;
+  }
+}
+
+.feedback-current {
+  display: block;
+}

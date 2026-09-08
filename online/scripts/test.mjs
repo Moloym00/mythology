@@ -6,6 +6,7 @@ for (const name of [
   'game/content',
   'game/engine',
   'game/ai',
+  'game/feedback',
   'rooms',
 ]) {
   const source = await readFile(`lib/${name}.ts`, 'utf8');
@@ -25,3 +26,5 @@ for (const name of [
 }
 await import('../tests/engine.test.mjs');
 await import('../tests/ai.test.mjs');
+
+await import('../tests/feedback.test.mjs');

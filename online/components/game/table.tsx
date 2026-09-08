@@ -32,6 +32,8 @@ import {
 } from '@/components/ui/select';
 import { GODS, SHAMANS, STORMS } from '@/lib/game/content';
 import { ELEMENTS, type Element } from '@/lib/game/engine';
+import { ScoreGuide, ActionPreview, Atmosphere } from './experience';
+import { describeChanges } from '@/lib/game/feedback';
 import type { RoomView } from '@/lib/rooms';
 
 const COLORS = [
@@ -69,11 +71,29 @@ export default function Table() {
   const sessionRef = useRef<Session | null>(null);
   const lock = useRef(false);
   const revisionRef = useRef<{ code: string; revision: number } | null>(null);
+  const previousRoom = useRef<RoomView | null>(null);
+  const [feedback, setFeedback] = useState<{ id: string; lines: string[] }[]>(
+    [],
+  );
   function accept(next: RoomView) {
     const old = revisionRef.current;
     if (old?.code === next.code && old.revision >= next.revision) return;
     revisionRef.current = { code: next.code, revision: next.revision };
+    const previous = previousRoom.current;
+    previousRoom.current = next;
     setRoom(next);
+    if (previous?.code === next.code && previous.game && next.game) {
+      // 租约、连接状态等房间更新不应打断选牌或播放结算音。
+      if (JSON.stringify(previous.game) === JSON.stringify(next.game)) return;
+      const lines = describeChanges(previous.game, next.game);
+      if (lines.length)
+        setFeedback((items) =>
+          [{ id: `${next.code}-${next.revision}`, lines }, ...items].slice(
+            0,
+            12,
+          ),
+        );
+    } else setFeedback([]);
     setChoice(null);
     setSelectedCard(null);
     setTarget(null);
@@ -203,6 +223,8 @@ export default function Table() {
   }
   function leaveView() {
     revisionRef.current = null;
+    previousRoom.current = null;
+    setFeedback([]);
     sessionRef.current = null;
     setSession(null);
     setRoom(null);
@@ -486,7 +508,8 @@ export default function Table() {
               </p>
             </div>
             <div className="round-info">
-              <span>后备神 {g.godCount}</span>
+              <span>后备神 {g.godCount} 尊 · 有限</span>
+              <Atmosphere cue={feedback[0]?.id ?? ''} />
               <span>风暴 {g.stormCount}</span>
               <Button variant="ghost" onClick={share}>
                 <Copy />
@@ -494,6 +517,7 @@ export default function Table() {
               </Button>
             </div>
           </section>
+          <ScoreGuide g={g} self={self} />
           <div className="players-strip">
             {g.players.map((p, i) => (
               <button
@@ -567,12 +591,18 @@ export default function Table() {
                 <h2>四座神座</h2>
                 <span className="muted">点击神座筛选行动 · 详情查看神恩</span>
               </div>
+              <p className="refill-guide">
+                唤醒 / 安魂 → 完成整理 → 后备补入。废墟永久关闭。
+                {g.godCount === 0
+                  ? '后备已空，不会再补神。'
+                  : `后备还剩 ${g.godCount} 尊，并非无限刷新。`}
+              </p>
               <div className="god-grid">
                 {g.seats.map((s, i) => {
                   const god = s.god !== null ? GODS[s.god] : null;
                   return (
                     <article
-                      key={i}
+                      key={`${i}-${s.god}-${s.ruins}`}
                       className={`god-card ${s.weather === 2 ? 'dying' : ''} ${target === i ? 'targeted' : ''} ${s.ruins ? 'ruins' : ''}`}
                     >
                       <button
@@ -601,7 +631,11 @@ export default function Table() {
                         <div className="god-body">
                           <span className="eyebrow">
                             {god?.culture ??
-                              (s.ruins ? '遗忘之地' : '等待补神')}
+                              (s.ruins
+                                ? '遗忘之地'
+                                : g.godCount
+                                  ? '整理结束后补入'
+                                  : '后备已用尽')}
                           </span>
                           <h3>{god?.name ?? (s.ruins ? '废墟' : '空神座')}</h3>
                           <div className="slots">
@@ -720,6 +754,33 @@ export default function Table() {
               )}
             </section>
             <aside className="table-aside">
+              <section className="panel decision-feedback">
+                <span className="eyebrow">火塘回响 · 最近的变化</span>
+                <output
+                  aria-live="polite"
+                  aria-atomic="true"
+                  key={feedback[0]?.id}
+                  className="feedback-current"
+                >
+                  {feedback[0] ? (
+                    feedback[0].lines.map((line, i) => <p key={i}>{line}</p>)
+                  ) : (
+                    <p>先选行动查看结果预告；结算后的得失会留在这里。</p>
+                  )}
+                </output>
+                {feedback.length > 1 && (
+                  <details>
+                    <summary>回看之前的变化（{feedback.length - 1}步）</summary>
+                    {feedback.slice(1).map((item) => (
+                      <div className="feedback-history" key={item.id}>
+                        {item.lines.map((line, i) => (
+                          <p key={i}>{line}</p>
+                        ))}
+                      </div>
+                    ))}
+                  </details>
+                )}
+              </section>
               <section className="panel action-panel">
                 <span className="eyebrow">
                   {g.phase === 'turn'
@@ -828,7 +889,7 @@ export default function Table() {
                           </SelectContent>
                         </Select>
                         {chosen && (
-                          <p className="chosen-description">{chosen.label}</p>
+                          <ActionPreview g={g} self={self} action={chosen} />
                         )}
                         <Button
                           className="big-button"
