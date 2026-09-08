@@ -1224,3 +1224,108 @@ footer {
 .action-groups[hidden] {
   display: none;
 }
+
+/* 纸卡的厚度、持握和落回；触屏保留点选与横向滑动。 */
+.hand {
+  padding: 28px 10px 22px;
+  gap: 13px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .hand {
+    overflow: visible;
+    flex-wrap: wrap;
+  }
+}
+.memory.tactile-card {
+  position: relative;
+  isolation: isolate;
+  user-select: none;
+  min-height: 166px;
+  flex-basis: 112px;
+  padding: 30px 13px 24px;
+  transform: rotate(var(--fan));
+  transform-origin: 50% 110%;
+  border: 1px solid #94866f;
+  border-radius: 9px;
+  background:
+    radial-gradient(ellipse at 45% 20%, #44505755, transparent 65%),
+    repeating-linear-gradient(
+      35deg,
+      #ffffff03 0px,
+      #ffffff03 1px,
+      transparent 1px,
+      transparent 4px
+    ),
+    #24323a;
+  box-shadow:
+    0 2px 0 #9d9077,
+    0 4px 0 #131b20,
+    0 9px 16px #0007;
+  transition:
+    transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.22s;
+  cursor: grab;
+}
+.memory.tactile-card::before {
+  content: '';
+  position: absolute;
+  inset: 7px;
+  border: 1px solid #b6a27a38;
+  border-radius: 5px;
+  pointer-events: none;
+}
+.memory.tactile-card .card-corner {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  font-size: 0.8rem;
+  margin: 0;
+}
+.memory.tactile-card .card-corner.bottom {
+  inset: auto 12px 10px auto;
+  transform: rotate(180deg);
+}
+.memory.tactile-card .card-sigil {
+  text-align: center;
+  font-size: 2.8rem;
+  text-shadow: 0 2px 2px #0008;
+}
+.memory.tactile-card small {
+  text-align: center;
+  font-size: 0.73rem;
+}
+.memory.tactile-card.selected {
+  transform: translateY(-16px) rotate(0deg);
+  outline: 2px solid #e6be7c;
+  box-shadow:
+    0 2px 0 #c7ac7c,
+    0 18px 28px #0009,
+    0 0 18px #e8b16825;
+  z-index: 2;
+}
+@media (hover: hover) {
+  .memory.tactile-card:hover {
+    transform: translateY(-12px) rotate(0deg);
+    z-index: 3;
+  }
+}
+.memory.tactile-card:focus-visible {
+  outline: 3px solid #f2d7a4;
+  outline-offset: 4px;
+}
+.memory.tactile-card.in-hand {
+  pointer-events: none;
+  z-index: 30;
+  transition: none;
+  cursor: grabbing;
+  box-shadow: 0 28px 35px #0009;
+}
+.god-card.receives-memory {
+  border-color: #ddb06c;
+  box-shadow: 0 0 20px #dfb37020;
+}
+@media (prefers-reduced-motion: reduce) {
+  .memory.tactile-card {
+    transition: none;
+  }
+}

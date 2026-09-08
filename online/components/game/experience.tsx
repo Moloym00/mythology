@@ -53,7 +53,7 @@ export function ScoreGuide({ g, self }: { g: GameView; self: number }) {
           {g.godCount} 尊。
         </p>
         <p>
-          供奉本身不加分。三槽填满时，拥有至少两枚供奉印记者得神（5分），其他参与者每枚得1余音；三人各一枚则各得1余音，神归公共区。织名者在符合守艺条件时额外得1余音。
+          供奉本身不加分。三槽填满时，拥有至少两枚供奉印记者得神（5分），其他参与者每枚得1余音；三人各一枚则各得1余音，神归公共区。织名者在符合传承条件时额外得1余音。
         </p>
         <p>
           最后一张风暴，或“后备用尽且在场至多一神”时，完成本轮后计分；四座全成废墟则立即全员失败。否则最高分成为传火者，同分先比唤醒＋安魂总尊数，再同分并列。
@@ -75,7 +75,7 @@ export function ActionPreview({
   const p = g.players[self],
     s = action.target === undefined ? undefined : g.seats[action.target];
   let text = '';
-  let title = action.group;
+  let title = action.group === '守艺' ? '传承' : action.group;
   const elements = actionMemories(g, self, action).map((c) => c.element);
   const names = elements.map((e) => `「${e}」`).join('、');
   if (action.group === '供奉' && s) {

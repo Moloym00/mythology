@@ -26,6 +26,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
 import { GODS, SHAMANS, STORMS } from '@/lib/game/content';
 import { ELEMENTS, type Element } from '@/lib/game/engine';
+import { MemoryCard } from './memory-card';
 import { ScoreGuide, ActionPreview, Atmosphere } from './experience';
 import { actionMemories, choiceKey } from '@/lib/game/presentation';
 import { describeChanges } from '@/lib/game/feedback';
@@ -244,8 +245,10 @@ export default function Table() {
     g?.actions.filter(
       (a) =>
         (group === '全部' || a.group === group) &&
-        (target === null || a.target === target) &&
-        (selectedCard === null || a.cards?.includes(selectedCard)),
+        (g.prompt !== null || target === null || a.target === target) &&
+        (g.prompt !== null ||
+          selectedCard === null ||
+          a.cards?.includes(selectedCard)),
     ) ?? [];
   // 相同印刷语素的实体卡对选择等价，界面合并重复文案；服务端仍保留唯一卡号。
   const uniqueActions = visibleActions.filter(
@@ -371,7 +374,7 @@ export default function Table() {
           </div>
           <div className="lobby-grid">
             <div>
-              <h2>选择你的守艺</h2>
+              <h2>选择你的传承</h2>
               <div className="shamans">
                 {SHAMANS.map((s) => {
                   const owner = room.members.find((m) => m.shaman === s.id);
@@ -523,7 +526,7 @@ export default function Table() {
                 className={`player-chip ${g.acting === i && g.phase !== 'ended' ? 'active' : ''}`}
                 style={{ '--player': COLORS[i] } as React.CSSProperties}
                 onClick={() => setInspectPlayer(i)}
-                aria-label={`查看${p.name}的公开神明与守艺`}
+                aria-label={`查看${p.name}的公开神明与传承`}
               >
                 <b>
                   {p.name}
@@ -604,7 +607,8 @@ export default function Table() {
                   return (
                     <article
                       key={`${i}-${s.god}-${s.ruins}`}
-                      className={`god-card ${s.weather === 2 ? 'dying' : ''} ${target === i ? 'targeted' : ''} ${s.ruins ? 'ruins' : ''}`}
+                      data-seat-index={i}
+                      className={`god-card ${s.weather === 2 ? 'dying' : ''} ${target === i ? 'targeted' : ''} ${s.ruins ? 'ruins' : ''} ${selectedCard !== null && g.actions.some((a) => a.group === '供奉' && a.target === i && a.cards?.[0] === selectedCard) ? 'receives-memory' : ''}`}
                     >
                       <button
                         className="god-select"
@@ -704,19 +708,33 @@ export default function Table() {
                     <span className="muted">剩余供奉印记 {me.marks} / 4</span>
                   </div>
                   <div className="hand">
-                    {me.hand.map((c) => (
-                      <button
+                    {me.hand.map((c, index) => (
+                      <MemoryCard
                         key={c.id}
-                        className={`memory e-${ELEMENTS.indexOf(c.element)} ${selectedCard === c.id ? 'selected' : ''}`}
-                        aria-pressed={selectedCard === c.id}
-                        onClick={() => {
+                        id={c.id}
+                        element={c.element}
+                        description={MEMORY[c.element]}
+                        selected={selectedCard === c.id}
+                        index={index}
+                        count={me.hand.length}
+                        onSelect={() => {
                           setSelectedCard(selectedCard === c.id ? null : c.id);
                           setChoice(null);
                         }}
-                      >
-                        <span>{c.element}</span>
-                        <small>{MEMORY[c.element]}</small>
-                      </button>
+                        onOffer={(card, seat) => {
+                          const offers = g.actions.filter(
+                            (a) =>
+                              a.group === '供奉' &&
+                              a.target === seat &&
+                              a.cards?.[0] === card,
+                          );
+                          if (!offers.length || busy) return;
+                          setSelectedCard(card);
+                          setTarget(seat);
+                          setGroup('供奉');
+                          setChoice(offers.length === 1 ? offers[0].id : null);
+                        }}
+                      />
                     ))}
                     {!me.hand.length && (
                       <p className="muted">
@@ -725,7 +743,7 @@ export default function Table() {
                     )}
                   </div>
                   <p className="muted hand-tip">
-                    每段记忆都可以献给神，也可以投入火中。唯有炎，燃烧时不损心智。
+                    点起一段记忆，再点亮它能回应的神座。也可用鼠标将它拖向神座，准备供奉。
                   </p>
                   <div className="collection">
                     <span>你的神明</span>
@@ -849,7 +867,7 @@ export default function Table() {
                               setChoice(null);
                             }}
                           >
-                            {v}
+                            {v === '守艺' ? '传承' : v}
                           </Button>
                         ),
                       )}
@@ -943,18 +961,16 @@ export default function Table() {
                       </>
                     ) : (
                       <p className="muted">
-                        没有符合筛选的行动，看看其他可能后查看其他选择。
+                        这段记忆暂时无法回应这尊神。试试别的记忆，或看看其他可能。
                       </p>
                     )}
                   </>
                 )}
                 {me && (
                   <details className="craft-info">
-                    <summary>{SHAMANS[me.shaman].name}的守艺</summary>
+                    <summary>{SHAMANS[me.shaman].name}的传承</summary>
                     <p>{SHAMANS[me.shaman].effect}</p>
-                    {me.craftUsed && (
-                      <span className="tag">每局一次的守艺已用</span>
-                    )}
+                    {me.craftUsed && <span className="tag">本夜已用</span>}
                   </details>
                 )}
               </section>
