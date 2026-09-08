@@ -1,3 +1,4 @@
+import { allowedOrigin } from '@/lib/request-origin';
 import { env } from 'cloudflare:workers';
 import { changeRoom, roomView, type Room } from '@/lib/rooms';
 import { act, actions, view } from '@/lib/game/engine';
@@ -59,8 +60,12 @@ export async function GET(req: Request) {
 }
 export async function POST(req: Request) {
   try {
-    const origin = req.headers.get('origin');
-    if (origin && origin !== new URL(req.url).origin)
+    if (
+      !allowedOrigin(
+        req,
+        (env as unknown as { PUBLIC_ORIGIN?: string }).PUBLIC_ORIGIN,
+      )
+    )
       return reply({ error: '请求来源不匹配' }, 403);
     const text = await req.text();
     if (text.length > 4096) return reply({ error: '请求过大' }, 413);

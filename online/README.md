@@ -128,3 +128,12 @@ Sites 配置位于 `.openai/hosting.json`，D1绑定名为 `DB`。此项目使�
 角色能力在界面与内置规则中称为“传承”；内部行动组沿用旧标识以兼容已有状态。手牌增加纸卡纹理、边框厚度、扇形角度和拿起反馈。鼠标可将手牌拖向有合法供奉的神座，准备行动后确认；有多种支付方式时仍需选择。触屏保留点选与横向滑动。寻忆等待选阶段不会被手牌、神座筛选遮住。
 
 移植评估：规则引擎、内容数据与服务端房间逻辑可复用。App可考虑静态React客户端加Capacitor，但当前Vinext服务端与D1需要独立部署，不能原样打入安装包。微信小程序需改造页面组件、存储、网络和音频适配；现有DOM组件及Web Audio不能直接照搬。若后端改为腾讯云，需替换Workers/D1接入层，保留规则与接口协议。当前未创建App或小程序工程。
+
+
+## 内网穿透来源校验
+
+公网HTTPS经穿透转到本机HTTP时，浏览器Origin与内部请求URL不同。运行服务时必须配置 `PUBLIC_ORIGIN` 为当前完整HTTPS来源（例如 `https://example.trycloudflare.com`）。只放行配置的确切来源，不信任任意转发头，不使用通配域名。临时隧道换地址时同步更新。
+
+已构建的本机服务可用 `node node_modules/wrangler/bin/wrangler.js dev --local --config dist/server/wrangler.json --ip 127.0.0.1 --port 3100 --persist-to .wrangler/state --var PUBLIC_ORIGIN:https://example.trycloudflare.com` 启动（先替换示例域名）。构建会重建dist配置，不能依赖手动修改dist持久保存来源设置。
+
+接口冒烟检查现在会携带与浏览器一致的Origin头；可通过TEST_ORIGIN指向当前穿透网址，检查创建、加入、开局、并发和AI整局。

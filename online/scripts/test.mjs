@@ -9,6 +9,7 @@ for (const name of [
   'game/feedback',
   'game/presentation',
   'rooms',
+  'request-origin',
 ]) {
   const source = await readFile(`lib/${name}.ts`, 'utf8');
   const output = ts
@@ -29,3 +30,5 @@ await import('../tests/engine.test.mjs');
 await import('../tests/ai.test.mjs');
 
 await import('../tests/feedback.test.mjs');
+
+await import('../tests/request-origin.test.mjs');

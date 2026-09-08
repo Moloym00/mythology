@@ -5,6 +5,7 @@ async function post(body, token) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      Origin: origin,
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     body: JSON.stringify(body),
@@ -110,9 +111,16 @@ while (soloState.game.phase !== 'ended' && steps++ < 1500) {
     revision: soloState.revision,
   };
   if (!humanAction && !aiRaceChecked) {
-    const raced = await Promise.all([post(command, soloToken), post(command, soloToken)]);
-    assert.equal(raced.filter(r => r.status === 200).length, 1, 'AI租约只允许一个推进者');
-    assert.equal(raced.filter(r => r.status === 409).length, 1);
+    const raced = await Promise.all([
+      post(command, soloToken),
+      post(command, soloToken),
+    ]);
+    assert.equal(
+      raced.filter((r) => r.status === 200).length,
+      1,
+      'AI租约只允许一个推进者',
+    );
+    assert.equal(raced.filter((r) => r.status === 409).length, 1);
     soloState = (await get(soloCode, soloToken)).data;
     assert.equal(soloState.revision, command.revision + 2, 'AI动作仅提交一次');
     aiRaceChecked = true;
