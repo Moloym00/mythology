@@ -74,3 +74,53 @@ console.log(
   'API smoke passed: create, join, host-only start, private hand projection, stale revision, atomic duplicate rejection, reconnect.',
 );
 console.log(`Local test room: ${code}`);
+
+// 一名真人加两名AI，通过真实HTTP一路玩到结算。
+const solo = await post({ type: 'create', name: 'AI验收玩家' });
+assert.equal(solo.status, 200);
+const soloToken = solo.data.token;
+const soloCode = solo.data.code;
+let soloState = solo.data;
+for (let i = 0; i < 2; i++) {
+  const added = await post(
+    { type: 'addBot', code: soloCode, revision: soloState.revision },
+    soloToken,
+  );
+  assert.equal(added.status, 200);
+  soloState = added.data;
+}
+const soloStarted = await post(
+  { type: 'start', code: soloCode, revision: soloState.revision },
+  soloToken,
+);
+assert.equal(soloStarted.status, 200);
+soloState = soloStarted.data;
+let steps = 0;
+let aiRaceChecked = false;
+while (soloState.game.phase !== 'ended' && steps++ < 1500) {
+  const humanAction =
+    soloState.game.actions.find(
+      (a) => a.group === '供奉' || a.group === '安魂',
+    ) ?? soloState.game.actions[0];
+  assert.ok(humanAction || soloState.aiPending, '单人房死锁');
+  const command = {
+    type: humanAction ? 'act' : 'aiTick',
+    action: humanAction?.id,
+    code: soloCode,
+    revision: soloState.revision,
+  };
+  if (!humanAction && !aiRaceChecked) {
+    const raced = await Promise.all([post(command, soloToken), post(command, soloToken)]);
+    assert.equal(raced.filter(r => r.status === 200).length, 1, 'AI租约只允许一个推进者');
+    assert.equal(raced.filter(r => r.status === 409).length, 1);
+    soloState = (await get(soloCode, soloToken)).data;
+    assert.equal(soloState.revision, command.revision + 2, 'AI动作仅提交一次');
+    aiRaceChecked = true;
+    continue;
+  }
+  const next = await post(command, soloToken);
+  assert.equal(next.status, 200, JSON.stringify(next.data));
+  soloState = next.data;
+}
+assert.equal(soloState.game.phase, 'ended');
+console.log(`Solo AI HTTP game completed in ${steps} steps.`);

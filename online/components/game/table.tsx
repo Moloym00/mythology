@@ -119,6 +119,22 @@ export default function Table() {
         if (!stopped) {
           accept(data);
           setConnected(true);
+          if (data.aiPending && !lock.current) {
+            const tick = await fetch('/api/rooms', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${session!.token}`,
+              },
+              body: JSON.stringify({
+                type: 'aiTick',
+                code: session!.code,
+                revision: data.revision,
+              }),
+              signal: AbortSignal.timeout(12000),
+            });
+            if (tick.ok && !stopped) accept((await tick.json()) as RoomView);
+          }
         }
       } catch (e) {
         if (!stopped) {
@@ -327,7 +343,6 @@ export default function Table() {
               <h1>
                 火塘 <span className="code">{room.code}</span>
               </h1>
-
             </div>
             <Button variant="outline" onClick={share}>
               <Copy />
@@ -383,6 +398,49 @@ export default function Table() {
               <p className="muted">
                 至少3人，最多6人。开局采用规则书的初次游戏神座配置。
               </p>
+              {room.host === room.you && (
+                <div className="ai-setup">
+                  <p>一个人也能玩：添加至少两位 AI。</p>
+                  <div className="action-groups">
+                    <Button
+                      variant="outline"
+                      disabled={busy || room.members.length >= 6}
+                      onClick={() => send('addBot')}
+                    >
+                      ＋ 添加AI
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      disabled={busy || !room.members.some((m) => m.bot)}
+                      onClick={() => send('removeBot')}
+                    >
+                      移除AI
+                    </Button>
+                  </div>
+                  <div className="action-groups">
+                    <Button
+                      variant={room.aiMode === 'local' ? 'default' : 'outline'}
+                      onClick={() => send('aiMode', { mode: 'local' })}
+                      disabled={busy}
+                    >
+                      本地AI · 免费
+                    </Button>
+                    <Button
+                      variant={room.aiMode === 'api' ? 'default' : 'outline'}
+                      onClick={() => send('aiMode', { mode: 'api' })}
+                      disabled={busy}
+                    >
+                      API / 反代
+                    </Button>
+                  </div>
+                  {room.aiMode === 'api' && (
+                    <p className="muted">
+                      使用本机 .dev.vars
+                      中配置的接口与模型，可能产生接口费用。未配置或请求失败时由本地AI接管。
+                    </p>
+                  )}
+                </div>
+              )}
               {room.host === room.you ? (
                 <Button
                   className="big-button"
@@ -460,6 +518,13 @@ export default function Table() {
               </button>
             ))}
           </div>
+          {room.members.some((m) => m.bot) && (
+            <p className="muted" aria-live="polite">
+              {room.aiPending
+                ? 'AI正在思考…'
+                : (room.aiStatus ?? 'AI已就座，轮到它时自动行动。')}
+            </p>
+          )}
           {g.phase === 'ended' && (
             <section className="ending panel">
               <Sparkles />

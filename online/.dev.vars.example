@@ -1,0 +1,5 @@
+# 复制为 .dev.vars，填写后重启开发服务；不要提交真实密钥。
+# 支持 OpenAI 格式 API / 反代，填到 /v1 层或完整 /chat/completions 路径。
+AI_BASE_URL="https://your-provider.example/v1"
+AI_MODEL="your-model-name"
+AI_API_KEY=""

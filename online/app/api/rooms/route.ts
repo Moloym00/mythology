@@ -1,5 +1,7 @@
 import { env } from 'cloudflare:workers';
 import { changeRoom, roomView, type Room } from '@/lib/rooms';
+import { act, actions, view } from '@/lib/game/engine';
+import { chooseAI } from '@/lib/game/ai';
 const TTL = 7 * 24 * 60 * 60 * 1000;
 function reply(value: unknown, status = 200) {
   return Response.json(value, {
@@ -129,6 +131,51 @@ export async function POST(req: Request) {
     const member = await identity(req, room);
     if (body.revision !== revision)
       return reply({ error: '牌桌已更新，请按最新状态重新选择' }, 409);
+    if (body.type === 'aiTick') {
+      if (!room.game || (room.aiLease ?? 0) > Date.now())
+        return reply(roomView(code, revision, room, member.id));
+      const player = room.members.findIndex(
+        (m, i) => m.bot && actions(room.game!, i).length,
+      );
+      if (player < 0) return reply(roomView(code, revision, room, member.id));
+      // 在调用付费接口前取得数据库租约，多个标签页只能有一个执行者。
+      room.aiLease = Date.now() + 15000;
+      const claim = await env.DB.prepare(
+        'UPDATE rooms SET state = ?, revision = revision + 1 WHERE code = ? AND revision = ?',
+      )
+        .bind(JSON.stringify(room), code, revision)
+        .run();
+      if (!claim.meta.changes) return reply({ error: '牌桌已更新' }, 409);
+      const config =
+        room.aiMode === 'api'
+          ? {
+              baseUrl: env.AI_BASE_URL,
+              model: env.AI_MODEL,
+              key: env.AI_API_KEY,
+            }
+          : {};
+      const decision = await chooseAI(view(room.game, player), player, config);
+      room.game = act(room.game, player, decision.action);
+      room.aiLease = 0;
+      room.aiStatus =
+        decision.mode === 'api'
+          ? 'API AI已行动'
+          : decision.mode === 'fallback'
+            ? 'API暂时不可用，本地AI已接管本步'
+            : room.aiMode === 'api' && (!config.baseUrl || !config.model)
+              ? 'API尚未配置，本地AI继续守夜'
+              : '本地AI已行动';
+      const saved = await env.DB.prepare(
+        'UPDATE rooms SET state = ?, revision = revision + 1, expires_at = ? WHERE code = ? AND revision = ?',
+      )
+        .bind(JSON.stringify(room), Date.now() + TTL, code, revision + 1)
+        .run();
+      if (!saved.meta.changes) {
+        const latest = await load(code);
+        return reply(roomView(code, latest.revision, latest.room, member.id));
+      }
+      return reply(roomView(code, revision + 2, room, member.id));
+    }
     const changedRoom = changeRoom(
       room,
       member.id,

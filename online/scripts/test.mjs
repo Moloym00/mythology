@@ -1,7 +1,13 @@
 import ts from 'typescript';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 // 使用工程已有 TypeScript，无需新增测试框架。
-for (const name of ['game/config', 'game/content', 'game/engine', 'rooms']) {
+for (const name of [
+  'game/config',
+  'game/content',
+  'game/engine',
+  'game/ai',
+  'rooms',
+]) {
   const source = await readFile(`lib/${name}.ts`, 'utf8');
   const output = ts
     .transpileModule(source, {
@@ -18,3 +24,4 @@ for (const name of ['game/config', 'game/content', 'game/engine', 'rooms']) {
   await writeFile(destination, output);
 }
 await import('../tests/engine.test.mjs');
+await import('../tests/ai.test.mjs');
