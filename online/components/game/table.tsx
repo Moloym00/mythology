@@ -717,6 +717,12 @@ export default function Table() {
                         selected={selectedCard === c.id}
                         index={index}
                         count={me.hand.length}
+                        onLift={() => {
+                          setSelectedCard(c.id);
+                          setTarget(null);
+                          setGroup('全部');
+                          setChoice(null);
+                        }}
                         onSelect={() => {
                           setSelectedCard(selectedCard === c.id ? null : c.id);
                           setChoice(null);

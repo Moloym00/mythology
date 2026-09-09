@@ -11,6 +11,7 @@ export function MemoryCard({
   index,
   count,
   onSelect,
+  onLift,
   onOffer,
 }: {
   id: number;
@@ -20,6 +21,7 @@ export function MemoryCard({
   index: number;
   count: number;
   onSelect: () => void;
+  onLift: () => void;
   onOffer: (card: number, seat: number) => void;
 }) {
   const gesture = useRef<{ x: number; y: number; dragged: boolean } | null>(
@@ -55,7 +57,10 @@ export function MemoryCard({
         if (!start) return;
         const x = e.clientX - start.x,
           y = e.clientY - start.y;
-        if (Math.hypot(x, y) > 7) start.dragged = true;
+        if (!start.dragged && Math.hypot(x, y) > 7) {
+          start.dragged = true;
+          onLift();
+        }
         if (start.dragged) setOffset({ x, y });
       }}
       onPointerUp={(e) => {
@@ -81,6 +86,12 @@ export function MemoryCard({
       onLostPointerCapture={() => {
         gesture.current = null;
         setOffset(null);
+      }}
+      onKeyDown={(e) => {
+        if (e.key !== 'Escape' || !gesture.current) return;
+        gesture.current = null;
+        setOffset(null);
+        suppressClick.current = true;
       }}
       onClick={() => {
         if (suppressClick.current) {
