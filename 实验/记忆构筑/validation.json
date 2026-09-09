@@ -1,0 +1,103 @@
+{
+  "version": "M0.1",
+  "checks": [
+    "每人十张记忆；循环洗牌与供奉均不跨越个人归属",
+    "改写先付两张，防守可拒绝；未完成回应时进攻者不能再行动",
+    "让出位置退回旧牌并补偿1余音，进攻牌真实转入神座",
+    "真名填满不立即得分；本轮结束多数者获得持续记忆",
+    "三人各一枚则公共觉醒：各1余音，不生成个人神记忆",
+    "安魂只支付两张并得2分与遗赠，不额外想起或恢复资源",
+    "永久燃忆记伤痕且不回洗；六张存续记忆时禁止再燃",
+    "遗赠用后不再出现；火姥神取回指定记忆而不多造牌",
+    "风暴毁座后归还记忆，不补神；所有座毁共同失败",
+    "非法行动不改变原状态；回望只引用真实事件编号",
+    "四神回想均能产生指定效果，记忆仍保持归属"
+  ],
+  "scenarios": [
+    {
+      "policies": [
+        "balanced",
+        "balanced",
+        "balanced"
+      ],
+      "games": 100,
+      "commonFailures": 0,
+      "averageSteps": 40.23,
+      "events": {
+        "awake": 64,
+        "rest": 41,
+        "contest": 89,
+        "displace": 57,
+        "defend": 32,
+        "burn": 37
+      },
+      "totalScoresOnSurvival": [
+        415,
+        451,
+        491
+      ],
+      "tiedWinsIncluded": [
+        57,
+        70,
+        76
+      ]
+    },
+    {
+      "policies": [
+        "rest",
+        "balanced",
+        "peaceful"
+      ],
+      "games": 100,
+      "commonFailures": 0,
+      "averageSteps": 41.1,
+      "events": {
+        "awake": 66,
+        "rest": 121,
+        "contest": 70,
+        "displace": 53,
+        "defend": 17,
+        "burn": 25
+      },
+      "totalScoresOnSurvival": [
+        543,
+        391,
+        362
+      ],
+      "tiedWinsIncluded": [
+        71,
+        34,
+        28
+      ]
+    },
+    {
+      "policies": [
+        "contest",
+        "balanced",
+        "peaceful"
+      ],
+      "games": 100,
+      "commonFailures": 0,
+      "averageSteps": 50.73,
+      "events": {
+        "awake": 116,
+        "rest": 92,
+        "contest": 344,
+        "displace": 274,
+        "defend": 70,
+        "burn": 67
+      },
+      "totalScoresOnSurvival": [
+        482,
+        588,
+        531
+      ],
+      "tiedWinsIncluded": [
+        30,
+        55,
+        34
+      ]
+    }
+  ],
+  "scope": "300局仅检查终止、守恒和固定策略下的事件分布。策略不是等强AI，不能把胜率当平衡结论；尚未证明好玩。"
+}

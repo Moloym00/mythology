@@ -1,0 +1,57 @@
+{
+  "scope": "每组300局，策略轮换座位；不是等强AI，不能作为平衡证明。unusedMemories仅指未发动专属能力，可能作为供奉使用。替代安魂限制只存在于内存试算，不修改可玩规则。",
+  "reports": [
+    {
+      "variant": "baseline",
+      "games": 300,
+      "awake": 222,
+      "communal": 623,
+      "rest": 353,
+      "ruin": 0,
+      "power": 79,
+      "unusedMemories": 143,
+      "fullSeatRest": 1,
+      "commonFailures": 0,
+      "policies": {
+        "rest": {
+          "score": 1685,
+          "tiedWins": 217
+        },
+        "balanced": {
+          "score": 1276,
+          "tiedWins": 105
+        },
+        "peaceful": {
+          "score": 984,
+          "tiedWins": 35
+        }
+      }
+    },
+    {
+      "variant": "rest_empty_only",
+      "games": 300,
+      "awake": 288,
+      "communal": 753,
+      "rest": 154,
+      "ruin": 3,
+      "power": 94,
+      "unusedMemories": 194,
+      "fullSeatRest": 0,
+      "commonFailures": 0,
+      "policies": {
+        "rest": {
+          "score": 1612,
+          "tiedWins": 204
+        },
+        "balanced": {
+          "score": 1559,
+          "tiedWins": 178
+        },
+        "peaceful": {
+          "score": 1163,
+          "tiedWins": 76
+        }
+      }
+    }
+  ]
+}
