@@ -1,0 +1,24 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),M=require('./engine-v02.js');
+const checks=[];function test(name,fn){fn();checks.push(name);console.log('PASS',name);}
+function card(g,p,e){for(const zone of ['hand','deck','discard']){const a=g.players[p][zone],k=a.findIndex(c=>c.element===e);if(k>=0)return a.splice(k,1)[0];}throw Error('no card');}
+function hand(g,p,e){const c=card(g,p,e);g.players[p].hand.push(c);return c;}
+function offer(g,p,s,e){const c=card(g,p,e);g.seats[s].offerings.push({player:p,card:c,element:e});return c;}
+function play(g,p,type,filter=()=>true){const a=M.legal(g,p).find(a=>a.type===type&&filter(a));assert.ok(a,type);const next=M.act(g,p,a.id);M.check(next);return next;}
+function filled(shared=false){const g=M.create(4);g.step='main';offer(g,0,0,'骨');offer(g,shared?1:0,0,'潮');offer(g,2,0,'风');return g;}
+test('填满后跨夜仍待呼名，供奉不会自动结算',()=>{let g=filled();g.step='cleanup';g.turn=2;g.acted=2;g=play(g,2,'end');assert.equal(g.round,2);assert.equal(g.seats[0].state,'active');assert.equal(g.seats[0].offerings.length,3);assert.equal(g.players[0].awake.length,0);});
+test('呼名占用主行动，多数者即时得到5分与手中记忆',()=>{let g=filled();g=play(g,0,'awaken');assert.equal(g.step,'cleanup');assert.equal(g.seats[0].state,'awake');assert.equal(M.score(g.players[0]),5);assert.equal(g.players[2].echo,1);assert.ok(g.players[0].hand.some(c=>c.god===0));assert.ok(!M.legal(g,0).some(a=>a.type==='offer'||a.type==='power'));});
+test('少数贡献者可以呼名，记忆与5分仍归多数者',()=>{let g=filled();g.turn=2;g=play(g,2,'awaken');assert.ok(g.players[0].hand.some(c=>c.god===0));assert.equal(g.events.find(e=>e.type==='invoke').who,2);assert.equal(g.players[2].awake.length,0);assert.equal(g.players[2].echo,1);});
+test('未贡献者不可呼名，未填满也不可呼名',()=>{let g=filled();g.turn=1;assert.ok(!M.legal(g,1).some(a=>a.type==='awaken'));g=M.create(4);g.step='main';assert.ok(!M.legal(g,0).some(a=>a.type==='awaken'));});
+test('众声觉醒三人各得一张独立记忆与1余音，无5分奖励',()=>{let g=filled(true);g=play(g,0,'awaken');const ids=[];g.players.forEach((p,i)=>{const c=p.hand.find(c=>c.god===0);assert.ok(c);assert.equal(c.owner,i);ids.push(c.id);assert.equal(M.score(p),1);assert.equal(p.awake.length,0);});assert.equal(new Set(ids).size,3);assert.equal(g.events.filter(e=>e.type==='communal').length,1);});
+test('新记忆以后可移动自己的供奉，绝不移动别人的供奉',()=>{let g=filled(true);g=play(g,0,'awaken');offer(g,0,2,'星');offer(g,1,1,'风');g.step='aux';const moves=M.legal(g,0).filter(a=>a.type==='power');assert.ok(moves.length);assert.ok(moves.every(a=>a.from===2));g=play(g,0,'power');assert.equal(g.seats[2].offerings.length,0);assert.ok(g.players[0].discard.some(c=>c.god===0));});
+test('呼名前可争夺，回应后多数归属会改变',()=>{let g=filled(true);hand(g,0,'潮');hand(g,0,'星');g=play(g,0,'contest',a=>a.seat===0&&a.element==='潮');assert.equal(M.actor(g),1);g=play(g,1,'yield');g.turn=2;g.step='main';g=play(g,2,'awaken');assert.deepEqual(g.players[0].awake,[0]);assert.equal(g.players[1].echo,1);assert.equal(g.players[2].echo,1);});
+test('呼名前风化到3仍会毁座，完整名字也无法自动幸免',()=>{let g=filled();g.round=3;g.seats[0].weather=2;g.turn=2;g.acted=2;g.step='cleanup';g=play(g,2,'end');assert.equal(g.seats[0].state,'ruin');assert.equal(g.players[0].awake.length,0);});
+test('第六夜未呼名的完整神座不自动计分',()=>{let g=filled();g.round=6;g.turn=2;g.acted=2;g.step='cleanup';g=play(g,2,'end');assert.equal(g.phase,'ended');assert.equal(g.seats[0].state,'active');assert.equal(M.score(g.players[0]),0);assert.equal(M.legal(g).length,0);});
+test('燃掉众声记忆永久丢失，记忆总数与归属不变',()=>{let g=filled(true);g=play(g,0,'awaken');g.step='aux';const id=g.players[0].hand.find(c=>c.god===0).id;g=play(g,0,'burn',a=>a.card===id);assert.ok(g.players[0].forgotten.some(c=>c.id===id));assert.equal(M.score(g.players[0]),0);});
+test('规则纯函数不改原状态，错误行动不生效',()=>{const g=filled(),before=JSON.stringify(g);play(g,0,'awaken');assert.equal(JSON.stringify(g),before);assert.throws(()=>M.act(g,1,'bad'));assert.equal(JSON.stringify(g),before);});
+let simulationGames=0;const totals={awake:0,communal:0,rest:0,ruin:0,power:0,contest:0};
+for(const policy of ['balanced','rest','contest','peaceful','random'])for(let seed=1;seed<=100;seed++){
+ let g=M.create(seed),n=0,rng=seed;while(g.phase!=='ended'&&n++<500){const who=M.actor(g),all=M.legal(g,who);rng=(Math.imul(rng,1664525)+1013904223)>>>0;const a=policy==='random'?all[rng%all.length]:M.choose(g,who,policy);assert.ok(a);g=M.act(g,who,a.id);M.check(g);}
+ assert.equal(g.phase,'ended');for(const e of g.events)if(e.type in totals)totals[e.type]++;for(const e of M.epilogue(g))assert.equal(g.events[e.seq-1].text,e.text);simulationGames++;
+}
+fs.writeFileSync(path.join(__dirname,'validation-v02.json'),JSON.stringify({version:'M0.2',checks,simulationGames,totals,scope:'固定策略及随机合法行动仅验证终止、守恒与边界，不证明乐趣、胜率平衡或UI质量。'},null,2));console.log('PASS',simulationGames,'complete games');

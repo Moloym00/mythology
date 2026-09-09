@@ -1,0 +1,77 @@
+{
+  "scope": "固定策略，轮换座位，每组300局；新呼名动作赋予固定启发式权重，不能当作平衡或乐趣证明。",
+  "results": [
+    {
+      "mode": "baseline",
+      "games": 300,
+      "rounds": 1240,
+      "awake": 222,
+      "communal": 623,
+      "rest": 353,
+      "ruin": 0,
+      "power": 79,
+      "contest": 227,
+      "memoryOffers": 44,
+      "failures": 0,
+      "scores": {
+        "rest": 1685,
+        "balanced": 1276,
+        "peaceful": 984
+      }
+    },
+    {
+      "mode": "hand",
+      "games": 300,
+      "rounds": 1231,
+      "awake": 217,
+      "communal": 628,
+      "rest": 355,
+      "ruin": 0,
+      "power": 78,
+      "contest": 216,
+      "memoryOffers": 43,
+      "failures": 0,
+      "scores": {
+        "rest": 1694,
+        "balanced": 1281,
+        "peaceful": 965
+      }
+    },
+    {
+      "mode": "shared_hand",
+      "games": 300,
+      "rounds": 1242,
+      "awake": 165,
+      "communal": 979,
+      "rest": 56,
+      "ruin": 0,
+      "power": 1549,
+      "contest": 150,
+      "memoryOffers": 580,
+      "failures": 0,
+      "scores": {
+        "rest": 1460,
+        "balanced": 1422,
+        "peaceful": 1239
+      }
+    },
+    {
+      "mode": "explicit",
+      "games": 300,
+      "rounds": 1522,
+      "awake": 477,
+      "communal": 327,
+      "rest": 379,
+      "ruin": 10,
+      "power": 587,
+      "contest": 153,
+      "memoryOffers": 282,
+      "failures": 0,
+      "scores": {
+        "rest": 1550,
+        "balanced": 1587,
+        "peaceful": 1222
+      }
+    }
+  ]
+}
